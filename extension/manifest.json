@@ -1,0 +1,50 @@
+{
+    "manifest_version": 3,
+    "name": "Podcast playlist creator",
+    "version": "1.0",
+    "description": "Download podcasts and create rss-feed",
+    "icons": {
+        "16": "favicon-32x32.png",
+        "48": "favicon-32x32.png",
+        "128": "favicon-32x32.png"
+    },
+    "action": {
+        "default_popup": "index.html"
+    },
+    "background": {
+        "service_worker": "service_worker.js",
+        "type": "module"
+    },
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "podcast_window.html"
+            ],
+            "matches": [
+                "https://*/*"
+            ]
+        }
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "https://*/*"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "css": [
+                "style.css"
+            ]
+        }
+    ],
+    "permissions": [
+        "tabs",
+        "webRequest",
+        "downloads",
+        "storage"
+    ],
+    "host_permissions": [
+        "*://*/*"
+    ]
+}
