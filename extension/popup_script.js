@@ -11,12 +11,13 @@ const getPodcasts = () => {
 }
 
 const parseTitle = title => title.replace(/[^A-Z0-9]/ig, "_") + ".mp3"
+const noHashTag = title => title.replace(/#/g, "")
 
 const downloadPodcasts = async () => {
     const podcasts = await getPodcasts()
     const rssSample = podcasts.map(p => `
     <item>
-        <title>${p.title}</title>
+        <title>${noHashTag(p.title)}</title>
         <enclosure
             url="https://podcasts-noan.web.app/${parseTitle(p.title)}"
             type="audio/mpeg"
