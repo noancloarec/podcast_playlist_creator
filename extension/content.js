@@ -37,7 +37,7 @@ let currentPodcast = {
  * On a click on an html element from the page, the text of the element being clicked will fill this input
  * This is used to set the duration and the title of the current podcast
  */
-let selectedInput = "title-holder"
+let selectedInput;
 
     
 /**
@@ -89,29 +89,15 @@ const unselectAllInputs = () => {
 }
 
 /**
- * Select an input to receive info about the current podcast
- * @param {string} inputId input id
- */
-const selectInput = (inputId) => {
-    unselectAllInputs()
-    document.getElementById(inputId).parentElement.classList.add("selected")
-    selectedInput = inputId
-}
-
-/**
  * Set an information about the current podcast
  * @param {Object} newProps properties to add to the podcast
- * @param {string} nextSelectedInput the id of the next input to select. If given this will change the selected
  */
-const setCurrentPodcast = (newProps, nextSelectedInput) => {
+const setCurrentPodcast = (newProps) => {
     currentPodcast = { ...currentPodcast, ...newProps }
     document.getElementById("url-holder").value = currentPodcast.url
     document.getElementById("title-holder").value = currentPodcast.title
     document.getElementById("duration-holder").value = currentPodcast.duration
 
-    if (nextSelectedInput) {
-        selectInput(nextSelectedInput)
-    }
 }
 
 /**
@@ -127,6 +113,9 @@ const displayPodcastWindow = async () => {
         e.stopPropagation()
         addCurrentPodcast()
     })
+    document.getElementById("title-holder").addEventListener("focus", () => selectedInput="title-holder")
+    document.getElementById("duration-holder").addEventListener("focus", () => selectedInput="duration-holder")
+
     displayPodcasts(await getPodcasts())
 }
 
@@ -139,13 +128,26 @@ const addCurrentPodcast = async () => {
     displayPodcasts(podcastList)
 }
 
+const tryToFindTitleAndDuration = () => {
+    if(location.origin.includes("radiofrance.fr")){
+        const title = document.querySelector("section.svelte-1cdrfq6>div span.svelte-1r0wuqp").textContent
+        const duration = document.querySelector("span.end.svelte-19tlmt6").textContent
+        setCurrentPodcast({duration, title})
+    }else if (location.origin.includes("")){
+        const title = document.querySelector("div.pdc-episode-title>div").textContent
+        const duration = document.querySelector("div.duration.duration-play").textContent
+        setCurrentPodcast({duration, title})
+    }
+}
+
 /**
  * Receives mp3 url intercepted from service worker to change the current podcast
  */
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     if (msg.action === "mp3_url_detected") {
-        setCurrentPodcast({ url: msg.url }, "title-holder")
+        setCurrentPodcast({ url: msg.url })
     }
+    setTimeout(tryToFindTitleAndDuration, 800)
     sendResponse(0)
 });
 
@@ -159,8 +161,10 @@ displayPodcastWindow()
 document.addEventListener("click", e => {
     const divContent = e.target.innerText
     if (selectedInput == "title-holder") {
-        setCurrentPodcast({ title: divContent }, "duration-holder")
+        setCurrentPodcast({ title: divContent })
     } else if (selectedInput == "duration-holder") {
-        setCurrentPodcast({ duration: divContent }, "title-holder")
+        setCurrentPodcast({ duration: divContent })
     }
 })
+
+
