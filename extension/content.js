@@ -133,7 +133,7 @@ const tryToFindTitleAndDuration = () => {
         const title = document.querySelector("section.svelte-1cdrfq6>div span.svelte-1r0wuqp").textContent
         const duration = document.querySelector("span.end.svelte-19tlmt6").textContent
         setCurrentPodcast({duration, title})
-    }else if (location.origin.includes("")){
+    }else if (location.origin.includes("timelinepodcast.fr")){
         const title = document.querySelector("div.pdc-episode-title>div").textContent
         const duration = document.querySelector("div.duration.duration-play").textContent
         setCurrentPodcast({duration, title})
