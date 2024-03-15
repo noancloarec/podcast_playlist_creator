@@ -10,16 +10,32 @@ const getPodcasts = () => {
     })
 }
 
-const parseTitle = title => title.replace(/[^A-Z0-9]/ig, "_") + ".mp3"
-const noHashTag = title => title.replace(/#/g, "")
+/**
+ * Replaces everything that is not an ascii char to make the title usable as a filename
+ * @param {string} title 
+ * @returns {string} the file name
+ */
+const getFileName = title => title.replace(/[^A-Z0-9]/ig, "_") + ".mp3"
 
+/**
+ * Remove hash from title because it creates a bug in the
+ * @param {string} title 
+ * @returns The title without hash
+ */
+const noHash = title => title.replace(/#/g, "")
+
+/**
+ * Asks the user to download 
+ * 1. A sample of the RSS feed containing all the podcast
+ * 2. Each of the podcasts
+ */
 const downloadPodcasts = async () => {
     const podcasts = await getPodcasts()
     const rssSample = podcasts.map(p => `
     <item>
-        <title>${noHashTag(p.title)}</title>
+        <title>${noHash(p.title)}</title>
         <enclosure
-            url="https://podcasts-noan.web.app/${parseTitle(p.title)}"
+            url="https://podcasts-noan.web.app/${getFileName(p.title)}"
             type="audio/mpeg"
         />
         <itunes:duration>${p.duration}</itunes:duration>
@@ -28,7 +44,7 @@ const downloadPodcasts = async () => {
     `).join("")
     chrome.downloads.download({ url: 'data:text/xml;charset=utf-8,' + rssSample, filename: "podcast_creator/feed.sample.xml" })
     podcasts.forEach(p => {
-        const filename = "podcast_creator/" + parseTitle(p.title)
+        const filename = "podcast_creator/" + getFileName(p.title)
         chrome.downloads.download({ url: p.url, filename });
     })
 
