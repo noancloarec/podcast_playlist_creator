@@ -39,6 +39,8 @@ let currentPodcast = {
  */
 let selectedInput;
 
+let podcastWindow;
+
     
 /**
  * Save the podcast list in parameter in chrome storage
@@ -104,11 +106,11 @@ const setCurrentPodcast = (newProps) => {
  * Display the podcast list window with the podcasts already saved in chrome storage.
  * Add the listener on the add podcast button so that the current podcast is added to the podcasts list
  */
-const displayPodcastWindow = async () => {
+const initPodcastWindow = async () => {
     const dt = await (await fetch(chrome.runtime.getURL("podcast_window.html"))).text()
-    const div = document.createElement("div")
-    div.innerHTML = dt
-    document.body.appendChild(div)
+    podcastWindow = document.createElement("div")
+    podcastWindow.innerHTML = dt
+    document.body.appendChild(podcastWindow)
     document.getElementById("add-podcast").addEventListener("click", e => {
         e.stopPropagation()
         addCurrentPodcast()
@@ -117,6 +119,7 @@ const displayPodcastWindow = async () => {
     document.getElementById("duration-holder").addEventListener("focus", () => selectedInput="duration-holder")
 
     displayPodcasts(await getPodcasts())
+    podcastWindow.style.display="none"
 }
 
 /**
@@ -128,6 +131,9 @@ const addCurrentPodcast = async () => {
     displayPodcasts(podcastList)
 }
 
+/**
+ * For specific sites, use their DOM structure to automatically fill in the info
+ */
 const tryToFindTitleAndDuration = () => {
     if(location.origin.includes("radiofrance.fr")){
         const title = document.querySelector("section.svelte-1cdrfq6>div span.svelte-1r0wuqp").textContent
@@ -140,19 +146,31 @@ const tryToFindTitleAndDuration = () => {
     }
 }
 
+const togglePodcastWindow = () => {
+    if(podcastWindow.style.display==="none"){
+        podcastWindow.style.display="block"
+    }else{
+        podcastWindow.style.display="none"
+    }
+}
+
 /**
  * Receives mp3 url intercepted from service worker to change the current podcast
+ * And toggle podcast window messag
  */
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     if (msg.action === "mp3_url_detected") {
         setCurrentPodcast({ url: msg.url })
+        setTimeout(tryToFindTitleAndDuration, 800)
+    }else if (msg.action === "toggle_podcast_window"){
+        togglePodcastWindow()
     }
-    setTimeout(tryToFindTitleAndDuration, 800)
     sendResponse(0)
 });
 
 
-displayPodcastWindow()
+
+initPodcastWindow()
 
 /**
  * Fill info about the current podcast whenever an element is clicked on the page
