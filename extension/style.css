@@ -1,7 +1,8 @@
-.selected{
+.selected {
     text-decoration: underline;
 }
-#podcast-creator-window{
+
+#podcast-creator-window {
     background-color: white;
     z-index: 9999;
     position: fixed;
@@ -9,4 +10,33 @@
     bottom: 300px;
     height: 300px;
     width: 300px;
+}
+
+#podcast-creator-window button {
+    background-color: #f44336;
+    border: none;
+    color: white;
+    padding: 3px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+
+}
+
+#podcast-creator-window input {
+    border: 1px solid black;
+}
+
+
+.add-podcast {
+    background-color: #04AA6D;
+}
+
+#current-podcast-selection {
+    margin-top: 10px;
+}
+
+#podcast-list {
+    font-family: monospace;
 }
