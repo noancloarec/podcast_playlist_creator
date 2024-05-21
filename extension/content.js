@@ -141,6 +141,9 @@ const tryToFindTitle = () => {
     } else if (location.origin.includes("timelinepodcast.fr")) {
         const title = document.querySelector("div.pdc-episode-title>div").textContent
         setCurrentPodcast({ title })
+    } else if (location.origin.includes("mediapart.fr")) {
+        const title = document.querySelector("h1").textContent
+        setCurrentPodcast({ title })
     }
 }
 

@@ -20,6 +20,6 @@ echo "
 
 
 
-# cp $1/*.mp3 public
-# firebase deploy
-# echo "Now go on https://www.playrun.app/podcast and add the private podcast with the url https://podcasts-noan.web.app/rss.xml"
+cp $1/*.mp3 public
+firebase deploy
+echo "Now go on https://www.playrun.app/podcast and add the private podcast with the url https://podcasts-noan.web.app/rss.xml"
