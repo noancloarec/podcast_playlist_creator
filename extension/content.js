@@ -119,7 +119,8 @@ const initPodcastWindow = async () => {
     document.getElementById("title-holder").addEventListener("change", e => setCurrentPodcast({ title: e.target.value }))
 
     displayPodcasts(await getPodcasts())
-    podcastWindow.style.display = "none"
+    console.log(localStorage.getItem("podcastWindowIsDisplayed"))
+    podcastWindow.style.display = localStorage.getItem("podcastWindowIsDisplayed") === "true"?"block":"none"
 }
 
 /**
@@ -148,11 +149,10 @@ const tryToFindTitle = () => {
 }
 
 const togglePodcastWindow = () => {
-    if (podcastWindow.style.display === "none") {
-        podcastWindow.style.display = "block"
-    } else {
-        podcastWindow.style.display = "none"
-    }
+    const shouldDisplay = localStorage.getItem("podcastWindowIsDisplayed") !== "true"
+    console.log({shouldDisplay})
+    podcastWindow.style.display = shouldDisplay ? "block" : "none"
+    localStorage.setItem("podcastWindowIsDisplayed", (shouldDisplay).toString())
 }
 
 /**
