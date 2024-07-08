@@ -13,9 +13,14 @@ const getPodcasts = () => {
 /**
  * Replaces everything that is not an ascii char to make the title usable as a filename
  * @param {string} title 
+ * @param {string} url the url of the file, from which the extension will be deduced 
  * @returns {string} the file name
  */
-const getFileName = title => title.replace(/[^A-Z0-9]/ig, "_") + ".mp3"
+const getFileName = (title, url) => {
+    const title_without_special_chars = title.replace(/[^A-Z0-9]/ig, "_")
+    const extension = url.split(".").at(-1)
+    return `${title_without_special_chars}.${extension}`
+}
 
 /**
  * Remove hash from title because it creates a bug in the
@@ -35,7 +40,7 @@ const downloadPodcasts = async () => {
     <item>
         <title>${noHash(p.title)}</title>
         <enclosure
-            url="https://podcasts-noan.web.app/${getFileName(p.title)}"
+            url="https://podcasts-noan.web.app/${getFileName(p.title, p.url)}"
             type="audio/mpeg"
         />
         <itunes:duration>${p.duration}</itunes:duration>
@@ -44,7 +49,7 @@ const downloadPodcasts = async () => {
     `).join("")
     chrome.downloads.download({ url: 'data:text/xml;charset=utf-8,' + rssSample, filename: "podcast_creator/feed.sample.xml" })
     podcasts.forEach(p => {
-        const filename = "podcast_creator/" + getFileName(p.title)
+        const filename = "podcast_creator/" + getFileName(p.title, p.url)
         chrome.downloads.download({ url: p.url, filename });
     })
 
@@ -52,12 +57,12 @@ const downloadPodcasts = async () => {
 
 const openPodcastWindow = () => {
     console.log("popup sends message")
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, {action:"toggle_podcast_window"}, function(response){
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, { action: "toggle_podcast_window" }, function (response) {
             console.log("got response", response)
         });
     });
-    
+
 }
 
 document.getElementById("download-podcasts").addEventListener("click", downloadPodcasts)
