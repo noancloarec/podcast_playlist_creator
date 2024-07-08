@@ -13,14 +13,10 @@ const getPodcasts = () => {
 /**
  * Replaces everything that is not an ascii char to make the title usable as a filename
  * @param {string} title 
- * @param {string} url the url of the file, from which the extension will be deduced 
  * @returns {string} the file name
  */
-const getFileName = (title, url) => {
-    const title_without_special_chars = title.replace(/[^A-Z0-9]/ig, "_")
-    const extension = url.split(".").at(-1)
-    return `${title_without_special_chars}.${extension}`
-}
+const removeSpecialChars = title => title.replace(/[^A-Z0-9]/ig, "_")
+
 
 /**
  * Remove hash from title because it creates a bug in the
@@ -40,7 +36,7 @@ const downloadPodcasts = async () => {
     <item>
         <title>${noHash(p.title)}</title>
         <enclosure
-            url="https://podcasts-noan.web.app/${getFileName(p.title, p.url)}"
+            url="https://podcasts-noan.web.app/${removeSpecialChars(p.title)}.mp3"
             type="audio/mpeg"
         />
         <itunes:duration>${p.duration}</itunes:duration>
@@ -49,7 +45,8 @@ const downloadPodcasts = async () => {
     `).join("")
     chrome.downloads.download({ url: 'data:text/xml;charset=utf-8,' + rssSample, filename: "podcast_creator/feed.sample.xml" })
     podcasts.forEach(p => {
-        const filename = "podcast_creator/" + getFileName(p.title, p.url)
+        const extension = p.url.split(".").at(-1)
+        const filename = "podcast_creator/" + removeSpecialChars(p.title) + "." + extension
         chrome.downloads.download({ url: p.url, filename });
     })
 
