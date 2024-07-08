@@ -120,7 +120,7 @@ const initPodcastWindow = async () => {
 
     displayPodcasts(await getPodcasts())
     console.log(localStorage.getItem("podcastWindowIsDisplayed"))
-    podcastWindow.style.display = localStorage.getItem("podcastWindowIsDisplayed") === "true"?"block":"none"
+    podcastWindow.style.display = localStorage.getItem("podcastWindowIsDisplayed") === "true" ? "block" : "none"
 }
 
 /**
@@ -137,7 +137,7 @@ const addCurrentPodcast = async () => {
  */
 const tryToFindTitle = () => {
     if (location.origin.includes("radiofrance.fr")) {
-        const title = document.querySelector("section.svelte-1cdrfq6>div span.svelte-1r0wuqp").textContent
+        const title = document.querySelector(".player>.Metadata>.details>.Descriptions>.Line").textContent
         setCurrentPodcast({ title })
     } else if (location.origin.includes("timelinepodcast.fr")) {
         const title = document.querySelector("div.pdc-episode-title>div").textContent
@@ -150,7 +150,6 @@ const tryToFindTitle = () => {
 
 const togglePodcastWindow = () => {
     const shouldDisplay = localStorage.getItem("podcastWindowIsDisplayed") !== "true"
-    console.log({shouldDisplay})
     podcastWindow.style.display = shouldDisplay ? "block" : "none"
     localStorage.setItem("podcastWindowIsDisplayed", (shouldDisplay).toString())
 }
@@ -160,8 +159,9 @@ const togglePodcastWindow = () => {
  * And toggle podcast window messag
  */
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
-    if (msg.action === "mp3_url_detected") {
+    if (msg.action === "media_url_detected") {
         setCurrentPodcast({ url: msg.url })
+        console.log(`media detected: ${msg.url}`)
         setTimeout(tryToFindTitle, 800)
     } else if (msg.action === "toggle_podcast_window") {
         togglePodcastWindow()
