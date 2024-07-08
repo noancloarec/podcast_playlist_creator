@@ -2,7 +2,7 @@
  * Representation of a podcast
  * @typedef {Object} Podcast
  * @property {string} title the podcast's title
- * @property {string} url the url of the mp3 file containing the podcast
+ * @property {string} url the url of the media file containing the podcast
  */
 
 /**
@@ -155,7 +155,7 @@ const togglePodcastWindow = () => {
 }
 
 /**
- * Receives mp3 url intercepted from service worker to change the current podcast
+ * Receives media url intercepted from service worker to change the current podcast
  * And toggle podcast window messag
  */
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
