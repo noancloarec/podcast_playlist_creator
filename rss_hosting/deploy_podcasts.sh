@@ -3,6 +3,7 @@ echo $1
 mkdir -p public/
 timestamp=$(date +%y%m%d_%H%M%S)
 [ ! -f public/rss.xml ] || mv public/rss.xml public/rss_$timestamp.xml
+./convert_m4a_to_mp3.sh $1
 rss_sample=$(./fill_podcast_duration.sh $1)
 echo "
 <rss version=\"2.0\" xmlns:itunes=\"http://www.itunes.com/dtds/podcast-1.0.dtd\">
