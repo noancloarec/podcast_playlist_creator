@@ -45,8 +45,12 @@ const downloadPodcasts = async () => {
     `).join("")
     chrome.downloads.download({ url: 'data:text/xml;charset=utf-8,' + rssSample, filename: "podcast_creator/feed.sample.xml" })
     podcasts.forEach(p => {
-        const extension = p.url.split(".").at(-1)
+        const urlWithoutGetParameters = p.url.split("?")[0]
+        const extension = urlWithoutGetParameters.split(".").at(-1)
         const filename = "podcast_creator/" + removeSpecialChars(p.title) + "." + extension
+        console.log("computed url and filname")
+        console.log({ url: p.url, filename })
+        console.log({urlWithoutGetParameters, extension})
         chrome.downloads.download({ url: p.url, filename });
     })
 

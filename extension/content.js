@@ -12,7 +12,6 @@
 const getPodcasts = () => {
     return new Promise((resolve) => {
         chrome.storage.local.get("podcast-list", (list) => {
-            console.log({ list, v: list != {} })
             if (list["podcast-list"] !== undefined) {
                 resolve(list["podcast-list"])
             } else {
