@@ -144,7 +144,14 @@ const tryToFindTitle = () => {
     } else if (location.origin.includes("mediapart.fr")) {
         const title = document.querySelector("h1").textContent
         setCurrentPodcast({ title })
+    } else if (location.origin.includes("euradio.fr")) {
+        const title = document.querySelector("h1").textContent.trim()
+        setCurrentPodcast({ title })
+    } else if (location.origin.includes("podcasts.apple.com")) {
+        const title = document.querySelector("h1").textContent.trim()
+        setCurrentPodcast({ title })
     }
+
 }
 
 const togglePodcastWindow = () => {
