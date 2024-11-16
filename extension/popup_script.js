@@ -23,7 +23,14 @@ const removeSpecialChars = title => title.replace(/[^A-Z0-9]/ig, "_")
  * @param {string} title 
  * @returns The title without hash
  */
-const noHash = title => title.replace(/#/g, "")
+const removeHashes = title => title.replace(/#/g, "")
+
+/**
+ * Remove the non latin characters from the title, otherwise eyeD3 cannot set the title properly
+ * @param {string} title 
+ * @returns the string with non-latin characters removed
+ */
+const removeNonLatinCharacters = title => title.replace(/[\u0250-\ue007]/g, '');
 
 /**
  * Asks the user to download 
@@ -34,7 +41,7 @@ const downloadPodcasts = async () => {
     const podcasts = await getPodcasts()
     const rssSample = podcasts.map(p => `
     <item>
-        <title>${noHash(p.title)}</title>
+        <title>${removeNonLatinCharacters(removeHashes(p.title))}</title>
         <enclosure
             url="https://podcasts-noan.web.app/${removeSpecialChars(p.title)}.mp3"
             type="audio/mpeg"
@@ -50,7 +57,7 @@ const downloadPodcasts = async () => {
         const filename = "podcast_creator/" + removeSpecialChars(p.title) + "." + extension
         console.log("computed url and filname")
         console.log({ url: p.url, filename })
-        console.log({urlWithoutGetParameters, extension})
+        console.log({ urlWithoutGetParameters, extension })
         chrome.downloads.download({ url: p.url, filename });
     })
 
