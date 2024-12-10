@@ -136,13 +136,13 @@ const addCurrentPodcast = async () => {
  */
 const tryToFindTitle = () => {
     if (location.origin.includes("radiofrance.fr")) {
-        const title = document.querySelector(".player>.Metadata>.details>.Descriptions>.Line").textContent
+        const title = document.querySelector("h1").textContent.trim()
         setCurrentPodcast({ title })
     } else if (location.origin.includes("timelinepodcast.fr")) {
-        const title = document.querySelector("div.pdc-episode-title>div").textContent
+        const title = document.querySelector("div.pdc-episode-title>div").textContent.trim()
         setCurrentPodcast({ title })
     } else if (location.origin.includes("mediapart.fr")) {
-        const title = document.querySelector("h1").textContent
+        const title = document.querySelector("h1").textContent.trim()
         setCurrentPodcast({ title })
     } else if (location.origin.includes("euradio.fr")) {
         const title = document.querySelector("h1").textContent.trim()
