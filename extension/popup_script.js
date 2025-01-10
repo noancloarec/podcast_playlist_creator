@@ -36,8 +36,9 @@ const removeNonLatinCharacters = title => title.replace(/[\u0250-\ue007]/g, '');
  * Asks the user to download 
  * 1. A sample of the RSS feed containing all the podcast
  * 2. Each of the podcasts
+ * @param {string} targetDirectory the sub-directoy in the download folder where to store the podcasts
  */
-const downloadPodcasts = async () => {
+const downloadPodcasts = async (targetDirectory) => {
     const podcasts = await getPodcasts()
     const rssSample = podcasts.map(p => `
     <item>
@@ -50,11 +51,11 @@ const downloadPodcasts = async () => {
         <pubDate>Thu, 04 Jan 2024</pubDate>
     </item>
     `).join("")
-    chrome.downloads.download({ url: 'data:text/xml;charset=utf-8,' + rssSample, filename: "podcast_creator/feed.sample.xml" })
+    chrome.downloads.download({ url: 'data:text/xml;charset=utf-8,' + rssSample, filename: `${targetDirectory}/feed.sample.xml` })
     podcasts.forEach(p => {
         const urlWithoutGetParameters = p.url.split("?")[0]
         const extension = urlWithoutGetParameters.split(".").at(-1)
-        const filename = "podcast_creator/" + removeSpecialChars(p.title) + "." + extension
+        const filename = `${targetDirectory}/${removeSpecialChars(p.title)}.${extension}`
         console.log("computed url and filname")
         console.log({ url: p.url, filename })
         console.log({ urlWithoutGetParameters, extension })
@@ -73,5 +74,6 @@ const openPodcastWindow = () => {
 
 }
 
-document.getElementById("download-podcasts").addEventListener("click", downloadPodcasts)
+document.getElementById("download-podcasts").addEventListener("click", () => downloadPodcasts("podcast_creator"))
+document.getElementById("download-podcasts-to-be-cut").addEventListener("click", () => downloadPodcasts("podcasts_to_cut"))
 document.getElementById("toggle-podcast-window").addEventListener("click", openPodcastWindow)
