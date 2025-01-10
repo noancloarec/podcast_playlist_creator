@@ -1,1 +1,3 @@
 rss_hosting/public
+.idea/
+__pycache__/
