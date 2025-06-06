@@ -6,10 +6,13 @@
     background-color: white;
     z-index: 9999;
     position: fixed;
+    top: 10vh;
     right: 0;
-    bottom: 300px;
-    height: 300px;
     width: 300px;
+}
+#podcast-creator-window ul{
+    height: 70vh;
+    overflow-y: scroll;
 }
 
 #podcast-creator-window button {
@@ -21,7 +24,6 @@
     text-decoration: none;
     display: inline-block;
     font-size: 16px;
-
 }
 
 #podcast-creator-window input {
