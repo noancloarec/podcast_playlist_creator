@@ -39,6 +39,14 @@ let selectedInput;
 
 let podcastWindow;
 
+/**
+ * The last element which has been clicked, if it is a button there is a chance the title we wish to determine is close by
+ * @type {HTMLElement}
+ */
+let lastClickedElement;
+
+
+
 
 /**
  * Save the podcast list in parameter in chrome storage
@@ -68,6 +76,10 @@ const displayPodcasts = (podcastList) => {
             return li
         })
     )
+    ul.scroll({
+        top: 10000,
+        behavior: "smooth"
+    })
 }
 
 /**
@@ -95,7 +107,6 @@ const unselectAllInputs = () => {
  */
 const setCurrentPodcast = (newProps) => {
     currentPodcast = { ...currentPodcast, ...newProps }
-    console.log(currentPodcast)
     document.getElementById("url-holder").value = currentPodcast.url
     document.getElementById("title-holder").value = currentPodcast.title
 
@@ -120,6 +131,15 @@ const initPodcastWindow = async () => {
     displayPodcasts(await getPodcasts())
     console.log(localStorage.getItem("podcastWindowIsDisplayed"))
     podcastWindow.style.display = localStorage.getItem("podcastWindowIsDisplayed") === "true" ? "block" : "none"
+
+    document.addEventListener("click", (event) => {       
+        lastClickedElement = event.target
+    })
+    document.addEventListener("keypress", (event)=>{
+        if(event.key==="q" && event.ctrlKey){
+            addCurrentPodcast()
+        }
+    })
 }
 
 /**
@@ -136,7 +156,13 @@ const addCurrentPodcast = async () => {
  */
 const tryToFindTitle = () => {
     if (location.origin.includes("radiofrance.fr")) {
-        const title = document.querySelector("h1.CoverEpisode-title").textContent.trim()
+        let title = document.querySelector("h1.CoverEpisode-title")?.textContent.trim()
+        if(!title){
+            title = lastClickedElement?.closest(".CardMedia").querySelector(".CardTitle").textContent.trim()
+        }
+        if(!title){
+            title=""
+        }
         setCurrentPodcast({ title })
     } else if (location.origin.includes("timelinepodcast.fr")) {
         const title = document.querySelector("div.pdc-episode-title>div").textContent.trim()
@@ -167,7 +193,6 @@ const togglePodcastWindow = () => {
 chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     if (msg.action === "media_url_detected") {
         setCurrentPodcast({ url: msg.url })
-        console.log(`media detected: ${msg.url}`)
         setTimeout(tryToFindTitle, 800)
     } else if (msg.action === "toggle_podcast_window") {
         togglePodcastWindow()
