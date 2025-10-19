@@ -16,3 +16,7 @@ def convert_to_mp3(input_file: Path, output_file: Path) -> None:
         ab="192k",  # Set audio bitrate to 192k
         y=None,  # Overwrite output files without asking
     ).global_args("-v", "5").run()
+
+
+def get_duration(input_file: Path) -> float:
+    return float(ffmpeg.probe(input_file)["format"]["duration"])

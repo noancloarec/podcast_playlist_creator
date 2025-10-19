@@ -1,11 +1,8 @@
-import shutil
 from datetime import datetime
 from os import listdir
 from pathlib import Path
 
 import eyed3
-import pytest
-from lxml import html
 from pytest_mock import MockerFixture
 
 from conftest import copy_resource_file_to
@@ -17,6 +14,7 @@ from python_client.upload_podcasts import (
     convert_m4a_files_to_mp3,
     set_id3_tags,
     fill_podcasts_duration,
+    duration_to_hours,
 )
 
 
@@ -113,6 +111,11 @@ def test_fill_podcasts_duration(tmp_path):
 
     # Then the feed.sample.xml files has a duration for this podcast
     feed_sample = XmlFeedSample(tmp_path / "feed.sample.xml")
-    feed_sample.set_duration(tmp_path / "sample.mp3", "12")
-    feed_sample.save()
     assert feed_sample.get_duration(tmp_path / "sample.mp3") == "00:00:05"
+
+
+def test_duration_to_hours():
+    assert duration_to_hours(3600) == "01:00:00"
+    assert duration_to_hours(4) == "00:00:04"
+    assert duration_to_hours(5.15) == "00:00:05"
+    assert duration_to_hours(3727) == "01:02:07"

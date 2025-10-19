@@ -1,54 +1,86 @@
 from pathlib import Path
+from textwrap import dedent
 
-from lxml import etree
-from lxml.html import HtmlElement, fromstring
+from xml.etree import ElementTree as ET
+from xml.etree.ElementTree import Element, ParseError
 
 
 class XmlFeedSample:
 
+    namespaces = {"itunes": "http://www.itunes.com/dtds/podcast-1.0.dtd"}
+
+    for ns, ns_full in namespaces.items():
+        ET.register_namespace(ns, ns_full)
+
     def __init__(self, input_file_path: Path):
-        self.html: HtmlElement = fromstring(input_file_path.read_text(encoding="utf-8"))
+        content = input_file_path.read_text(encoding="utf-8")
+        try:
+            self.tree = ET.ElementTree(ET.fromstring(content))
+        except ParseError:
+            self.tree = ET.ElementTree(
+                ET.fromstring(
+                    (
+                        dedent(
+                            """\
+            <rss version=\"2.0\" xmlns:itunes=\"http://www.itunes.com/dtds/podcast-1.0.dtd\">
+                <script />
+                <channel>
+                    <title>Noan's podcasts</title>
+                    <link>https://podcasts-noan.web.app/rss.xml</link>
+                    <description>An auto generated podcast playlist</description>
+                    <language>fr</language>
+                    <copyright>Radio France, Timeline</copyright>"""
+                        )
+                        + input_file_path.read_text(encoding="utf-8")
+                        + dedent(
+                            """\
+                </channel>
+            </rss>"""
+                        )
+                    )
+                )
+            )
+
         self.path = input_file_path
 
     def save(self):
-        content: bytes = etree.tostring(self.html, encoding="utf-8")
-        Path(self.path).write_text(content.decode(encoding="utf-8"), encoding="utf-8")
+        self.tree.write(self.path, encoding="utf-8")
 
     def get_podcast_title(self, podcast_filename: Path) -> str:
         return get_item_title(self._get_corresponding_item(podcast_filename))
 
     def get_duration(self, podcast_filename: Path) -> str:
         item = self._get_corresponding_item(podcast_filename)
-        duration_element: HtmlElement | None = next(
-            child for child in item if child.tag == "itunes:duration"
+        duration_element: Element | None = item.find(
+            "itunes:duration", namespaces=self.namespaces
         )
-        return duration_element.text_content()
+        return duration_element.text
 
     def set_duration(self, podcast_filename: Path, duration: str):
         item = self._get_corresponding_item(podcast_filename)
-        duration_element: HtmlElement | None = next(
-            child for child in item if child.tag == "itunes:duration"
+        duration_element: Element | None = item.find(
+            "itunes:duration", namespaces=self.namespaces
         )
-        item.remove(duration_element)
-        item.append(fromstring(f"<itunes:duration>{duration}</itunes:duration>"))
 
-    def _get_corresponding_item(self, podcast_filename: Path) -> HtmlElement:
+        item.remove(duration_element)
+        duration_element = Element("itunes:duration")
+        duration_element.text = duration
+        item.append(duration_element)
+
+    def _get_corresponding_item(self, podcast_filename: Path) -> Element:
         return next(
             item
-            for item in self.html
+            for item in self.tree.find("channel").findall("item")
             if get_item_filename(item) == podcast_filename.name
         )
 
 
-def get_item_title(item: HtmlElement) -> str:
-    title_tag: HtmlElement = next(child for child in item if child.tag == "title")
+def get_item_title(item: Element) -> str:
+    title_tag: Element = item.find("title")
     return title_tag.text
 
 
-def get_item_filename(item: HtmlElement) -> str:
-    enclosure_tag: HtmlElement = next(
-        child for child in item if child.tag == "enclosure"
-    )
-    url: str = enclosure_tag.attrib["url"]
+def get_item_filename(item: Element) -> str:
+    url: str = item.find("enclosure").attrib["url"]
     filename = url.split("/")[-1]
     return filename

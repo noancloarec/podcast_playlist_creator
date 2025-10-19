@@ -3,10 +3,13 @@ from datetime import datetime
 from pathlib import Path
 
 import eyed3
-from lxml import html
 
-from python_client.audio_processing import convert_to_mp3
-from python_client.feed_xml_processing import get_item_filename, get_item_title
+from python_client.audio_processing import convert_to_mp3, get_duration
+from python_client.feed_xml_processing import (
+    get_item_filename,
+    get_item_title,
+    XmlFeedSample,
+)
 
 
 def upload_podcasts():
@@ -21,22 +24,32 @@ def upload_podcasts():
     pass
 
 
+def get_mp3_files(folder: Path) -> list[Path]:
+    return [filename for filename in folder.iterdir() if filename.suffix == ".mp3"]
+
+
+def duration_to_hours(duration_in_seconds: float) -> str:
+    duration_in_seconds = int(duration_in_seconds)
+    hours = duration_in_seconds // 3600
+    minutes = (duration_in_seconds - 3600 * hours) // 60
+    seconds = duration_in_seconds % 60 // 1
+    return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+
+
 def fill_podcasts_duration(in_directory: Path) -> None:
-    pass
+    xml_feed = XmlFeedSample(in_directory / "feed.sample.xml")
+    for mp3_file in get_mp3_files(in_directory):
+        duration = get_duration(mp3_file)
+        xml_feed.set_duration(mp3_file, duration_to_hours(duration))
+    xml_feed.save()
 
 
 def set_id3_tags(in_directory: Path) -> None:
-    feed = html.fromstring(Path(in_directory / "feed.sample.xml").read_text())
-    mp3_files = [
-        filename for filename in in_directory.iterdir() if filename.suffix == ".mp3"
-    ]
-    for mp3_file in mp3_files:
+    xml_feed = XmlFeedSample(in_directory / "feed.sample.xml")
 
-        corresponding_item = next(
-            item for item in feed if get_item_filename(item) == mp3_file.name
-        )
+    for mp3_file in get_mp3_files(in_directory):
         audio_file = eyed3.load(mp3_file)
-        audio_file.tag.title = get_item_title(corresponding_item)
+        audio_file.tag.title = xml_feed.get_podcast_title(mp3_file)
         audio_file.tag.save()
 
     return None
