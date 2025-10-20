@@ -40,7 +40,17 @@ const removeNonLatinCharacters = title => title.replace(/[\u0250-\ue007]/g, '');
  */
 const downloadPodcasts = async (targetDirectory) => {
     const podcasts = await getPodcasts()
-    const rssSample = podcasts.map(p => `
+    const rssFeedHeader = `\
+        <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+        <script />
+        <channel>
+            <title>Noan's podcasts</title>
+            <link>https://podcasts-noan.web.app/rss.xml</link>
+            <description>An auto generated podcast playlist</description>
+            <language>fr</language>
+            <copyright>Radio France, Timeline</copyright>`
+        .replace("        ", "")
+    const items = podcasts.map(p => `
     <item>
         <title>${removeNonLatinCharacters(removeHashes(p.title))}</title>
         <enclosure
@@ -51,7 +61,13 @@ const downloadPodcasts = async (targetDirectory) => {
         <pubDate>Thu, 04 Jan 2024</pubDate>
     </item>
     `).join("")
-    chrome.downloads.download({ url: 'data:text/xml;charset=utf-8,' + rssSample, filename: `${targetDirectory}/feed.sample.xml` })
+    const rssFeedFooter = `\
+                </channel>
+        </rss>`.replaceAll("        ", "")
+    
+    const rssFeed = rssFeedHeader + items + rssFeedFooter
+
+    chrome.downloads.download({ url: 'data:text/xml;charset=utf-8,' + rssFeed, filename: `${targetDirectory}/rss.xml` })
     podcasts.forEach(p => {
         const urlWithoutGetParameters = p.url.split("?")[0]
         const extension = urlWithoutGetParameters.split(".").at(-1)
