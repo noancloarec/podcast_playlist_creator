@@ -1,3 +1,4 @@
+import shutil
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -6,13 +7,12 @@ import eyed3
 
 from python_client.audio_processing import convert_to_mp3, get_duration
 from python_client.feed_xml_processing import (
-    get_item_filename,
-    get_item_title,
     XmlFeedSample,
 )
 
 
 def upload_podcasts():
+
     input_folder = Path(sys.argv[1])
 
     public_dir_path = determine_public_dir_path()
@@ -21,7 +21,9 @@ def upload_podcasts():
     convert_m4a_files_to_mp3(input_folder)
     set_id3_tags(input_folder)
     fill_podcasts_duration(input_folder)
-    pass
+    shutil.copy(input_folder / "feed.sample.xml", public_dir_path / "rss.xml")
+    for mp3_file in get_mp3_files(input_folder):
+        shutil.copy(mp3_file, public_dir_path / mp3_file.name)
 
 
 def get_mp3_files(folder: Path) -> list[Path]:
@@ -45,6 +47,7 @@ def fill_podcasts_duration(in_directory: Path) -> None:
 
 
 def set_id3_tags(in_directory: Path) -> None:
+    eyed3.log.setLevel("ERROR")
     xml_feed = XmlFeedSample(in_directory / "feed.sample.xml")
 
     for mp3_file in get_mp3_files(in_directory):

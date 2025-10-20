@@ -68,11 +68,17 @@ class XmlFeedSample:
         item.append(duration_element)
 
     def _get_corresponding_item(self, podcast_filename: Path) -> Element:
-        return next(
-            item
-            for item in self.tree.find("channel").findall("item")
-            if get_item_filename(item) == podcast_filename.name
-        )
+        try:
+            return next(
+                item
+                for item in self.tree.find("channel").findall("item")
+                if get_item_filename(item) == podcast_filename.name
+            )
+        except StopIteration:
+            print(
+                f"Cannot find the podcast {podcast_filename.name} in this list of items : {list(self.tree.find("channel").findall("item"))}"
+            )
+            raise
 
 
 def get_item_title(item: Element) -> str:
