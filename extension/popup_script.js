@@ -1,6 +1,6 @@
 const getPodcasts = () => {
     return new Promise((resolve) => {
-        chrome.storage.local.get("podcast-list", (list) => {
+        browser.storage.local.get("podcast-list", (list) => {
             if (list != {}) {
                 resolve(list["podcast-list"])
             } else {
@@ -33,6 +33,14 @@ const removeHashes = title => title.replace(/#/g, "")
 const removeNonLatinCharacters = title => title.replace(/[\u0250-\ue007]/g, '');
 
 /**
+ * Generate the data url for an xml file
+ */
+const getDataUrlForXML = xmlData => {
+    const blob = new Blob([xmlData], {type: "text/xml;charset=utf-8"})
+    return URL.createObjectURL(blob)
+}
+
+/**
  * Asks the user to download 
  * 1. A sample of the RSS feed containing all the podcast
  * 2. Each of the podcasts
@@ -51,7 +59,7 @@ const downloadPodcasts = async (targetDirectory) => {
         <pubDate>Thu, 04 Jan 2024</pubDate>
     </item>
     `).join("")
-    chrome.downloads.download({ url: 'data:text/xml;charset=utf-8,' + rssSample, filename: `${targetDirectory}/feed.sample.xml` })
+    browser.downloads.download({ url: getDataUrlForXML("patate"), filename: `${targetDirectory}/feed.sample.xml` })
     podcasts.forEach(p => {
         const urlWithoutGetParameters = p.url.split("?")[0]
         const extension = urlWithoutGetParameters.split(".").at(-1)
@@ -59,15 +67,15 @@ const downloadPodcasts = async (targetDirectory) => {
         console.log("computed url and filname")
         console.log({ url: p.url, filename })
         console.log({ urlWithoutGetParameters, extension })
-        chrome.downloads.download({ url: p.url, filename });
+        browser.downloads.download({ url: p.url, filename });
     })
 
 }
 
 const openPodcastWindow = () => {
     console.log("popup sends message")
-    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, { action: "toggle_podcast_window" }, function (response) {
+    browser.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+        browser.tabs.sendMessage(tabs[0].id, { action: "toggle_podcast_window" }, function (response) {
             console.log("got response", response)
         });
     });

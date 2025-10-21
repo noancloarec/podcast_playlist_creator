@@ -1,3 +1,5 @@
+console.log("IM the content script")
+
 /**
  * Representation of a podcast
  * @typedef {Object} Podcast
@@ -117,7 +119,7 @@ const setCurrentPodcast = (newProps) => {
  * Add the listener on the add podcast button so that the current podcast is added to the podcasts list
  */
 const initPodcastWindow = async () => {
-    const dt = await (await fetch(chrome.runtime.getURL("podcast_window.html"))).text()
+    const dt = await (await fetch(browser.runtime.getURL("podcast_window.html"))).text()
     podcastWindow = document.createElement("div")
     podcastWindow.innerHTML = dt
     document.body.appendChild(podcastWindow)
@@ -135,8 +137,9 @@ const initPodcastWindow = async () => {
     document.addEventListener("click", (event) => {       
         lastClickedElement = event.target
     })
-    document.addEventListener("keypress", (event)=>{
-        if(event.key==="q" && event.ctrlKey){
+    document.addEventListener("keydown", (event)=>{
+        console.log(event)
+        if(event.key==="e" && event.ctrlKey){
             addCurrentPodcast()
         }
     })
@@ -155,26 +158,28 @@ const addCurrentPodcast = async () => {
  * For specific sites, use their DOM structure to automatically fill in the info
  */
 const tryToFindTitle = () => {
+    console.log("Trying to find title")
+    let title;
     if (location.origin.includes("radiofrance.fr")) {
-        let title = document.querySelector("h1.CoverEpisode-title")?.textContent.trim()
+        title = document.querySelector("h1.CoverEpisode-title")?.textContent.trim()
         if(!title){
             title = lastClickedElement?.closest(".CardMedia").querySelector(".CardTitle").textContent.trim()
         }
-        if(!title){
-            title=""
-        }
         setCurrentPodcast({ title })
     } else if (location.origin.includes("timelinepodcast.fr")) {
-        const title = document.querySelector("div.pdc-episode-title>div").textContent.trim()
-        setCurrentPodcast({ title })
+        title = document.querySelector("div.pdc-episode-title>div").textContent.trim()
     } else if (location.origin.includes("mediapart.fr")) {
-        const title = document.querySelector("h1").textContent.trim()
+        title = document.querySelector("h1").textContent.trim()
         setCurrentPodcast({ title })
     } else if (location.origin.includes("euradio.fr")) {
-        const title = document.querySelector("h1").textContent.trim()
+        title = document.querySelector("h1").textContent.trim()
         setCurrentPodcast({ title })
     } else if (location.origin.includes("podcasts.apple.com")) {
-        const title = document.querySelector("h1").textContent.trim()
+        title = document.querySelector("h1").textContent.trim()
+        setCurrentPodcast({ title })
+    }
+    if(title){
+        console.log(`Found title: ${title}`)
         setCurrentPodcast({ title })
     }
 
@@ -190,7 +195,7 @@ const togglePodcastWindow = () => {
  * Receives media url intercepted from service worker to change the current podcast
  * And toggle podcast window messag
  */
-chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
+browser.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
     if (msg.action === "media_url_detected") {
         setCurrentPodcast({ url: msg.url })
         setTimeout(tryToFindTitle, 800)
