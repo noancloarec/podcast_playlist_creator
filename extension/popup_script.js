@@ -1,3 +1,4 @@
+console.log("im the popup script")
 /**
  * Representation of a podcast
  * @typedef {Object} Podcast
@@ -47,8 +48,23 @@ const removeNonLatinCharacters = title => title.replace(/[\u0250-\ue007]/g, '');
  * Generate the data url for an xml file
  */
 const getDataUrlForXML = xmlData => {
-    const blob = new Blob([xmlData], {type: "text/xml;charset=utf-8"})
-    return URL.createObjectURL(blob)
+    return `data:text/xml;charset=utf-8,${xmlData}`
+}
+
+
+/**
+ * Download a file
+ * @param {string} uri The uri (url or data url)
+ * @param {string} name The name of the file to download
+ */
+const downloadURL = (uri, name) => {
+    var link = document.createElement("a");
+    link.download = name;
+    link.href = uri;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    delete link;
 }
 
 /**
@@ -83,10 +99,9 @@ const downloadPodcasts = async (targetDirectory) => {
     const rssFeedFooter = `\
                 </channel>
         </rss>`.replaceAll("        ", "")
-    
-    const rssFeed = rssFeedHeader + items + rssFeedFooter
 
-    browser.downloads.download({ url: getDataUrlForXML(rssFeed), filename: `${targetDirectory}/rss.xml` })
+    const rssFeed = rssFeedHeader + items + rssFeedFooter
+    downloadURL(getDataUrlForXML(rssFeed), `rss.xml`)
     podcasts.forEach(p => {
         const urlWithoutGetParameters = p.url.split("?")[0]
         const extension = urlWithoutGetParameters.split(".").at(-1)

@@ -6,7 +6,7 @@ import eyed3
 from pytest_mock import MockerFixture
 
 from conftest import copy_resource_file_to
-from python_client.feed_xml_processing import XmlFeedSample
+from python_client.rss_feed import RssFeed, get_podcast_duration
 from python_client.upload_podcasts import (
     determine_public_dir_path,
     create_dir_if_necessary,
@@ -89,29 +89,29 @@ def test_convert_m4a_files_to_mp3(tmp_path, mocker: MockerFixture):
 
 
 def test_set_id3_tags(tmp_path):
-    # Given an input folder that contains an mp3 file which does not have an id3 title set, but has a title info in a separate file feed.sample.xml
+    # Given an input folder that contains an mp3 file which does not have an id3 title set, but has a title info in a separate file rss.xml
     copy_resource_file_to("sample.mp3", tmp_path)
-    copy_resource_file_to("feed.sample.xml", tmp_path)
+    copy_resource_file_to("rss.xml", tmp_path)
 
     # When id3 tags are set
     set_id3_tags(tmp_path)
 
-    # Then the file's id3 title is the title provided by feed.sample.xml
+    # Then the file's id3 title is the title provided by rss.xml
     audiofile = eyed3.load(tmp_path / "sample.mp3")
     assert audiofile.tag.title == "Sample file"
 
 
 def test_fill_podcasts_duration(tmp_path):
-    # Given an input folder with an mp3 and a corresponding feed.sample.xml
+    # Given an input folder with an mp3 and a corresponding rss.xml
     copy_resource_file_to("sample.mp3", tmp_path)
-    copy_resource_file_to("feed.sample.xml", tmp_path)
+    copy_resource_file_to("rss.xml", tmp_path)
 
     # When fill_podcast_duration is run
     fill_podcasts_duration(tmp_path)
 
-    # Then the feed.sample.xml files has a duration for this podcast
-    feed_sample = XmlFeedSample(tmp_path / "feed.sample.xml")
-    assert feed_sample.get_duration(tmp_path / "sample.mp3") == "00:00:05"
+    # Then the rss.xml files has a duration for this podcast
+    feed_sample = RssFeed(tmp_path / "rss.xml")
+    assert get_podcast_duration(feed_sample, tmp_path / "sample.mp3") == "00:00:05"
 
 
 def test_duration_to_hours():

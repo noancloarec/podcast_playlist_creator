@@ -6,8 +6,11 @@ from pathlib import Path
 import eyed3
 
 from python_client.audio_processing import convert_to_mp3, get_duration
-from python_client.feed_xml_processing import (
-    XmlFeedSample,
+from python_client.rss_feed import (
+    RssFeed,
+    get_podcast_title,
+    save_rss_feed,
+    set_podcast_duration,
 )
 
 
@@ -21,7 +24,8 @@ def upload_podcasts():
     convert_m4a_files_to_mp3(input_folder)
     set_id3_tags(input_folder)
     fill_podcasts_duration(input_folder)
-    shutil.copy(input_folder / "feed.sample.xml", public_dir_path / "rss.xml")
+
+    shutil.copy(input_folder / "rss.xml", public_dir_path / "rss.xml")
     for mp3_file in get_mp3_files(input_folder):
         shutil.copy(mp3_file, public_dir_path / mp3_file.name)
 
@@ -39,20 +43,20 @@ def duration_to_hours(duration_in_seconds: float) -> str:
 
 
 def fill_podcasts_duration(in_directory: Path) -> None:
-    xml_feed = XmlFeedSample(in_directory / "feed.sample.xml")
+    xml_feed = RssFeed(in_directory / "rss.xml")
     for mp3_file in get_mp3_files(in_directory):
         duration = get_duration(mp3_file)
-        xml_feed.set_duration(mp3_file, duration_to_hours(duration))
-    xml_feed.save()
+        xml_feed = set_podcast_duration(xml_feed, mp3_file, duration_to_hours(duration))
+    save_rss_feed(xml_feed, in_directory / "rss.xml")
 
 
 def set_id3_tags(in_directory: Path) -> None:
     eyed3.log.setLevel("ERROR")
-    xml_feed = XmlFeedSample(in_directory / "feed.sample.xml")
+    rss_feed = RssFeed(in_directory / "rss.xml")
 
     for mp3_file in get_mp3_files(in_directory):
         audio_file = eyed3.load(mp3_file)
-        audio_file.tag.title = xml_feed.get_podcast_title(mp3_file)
+        audio_file.tag.title = get_podcast_title(rss_feed, mp3_file)
         audio_file.tag.save()
 
     return None

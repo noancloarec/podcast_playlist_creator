@@ -1,0 +1,31 @@
+<rss version="2.0"
+     xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+    <script/>
+    <channel>
+        <title>Noan's podcasts</title>
+        <link>https://podcasts-noan.web.app/rss.xml</link>
+        <description>An auto generated podcast playlist</description>
+        <language>fr</language>
+        <copyright>Radio France, Timeline</copyright>
+
+        <item>
+            <title>Une journée à la radio en mars 1968</title>
+            <enclosure
+                    url="https://my-website-noan.web.app/Une_journ_e___la_radio_en_mars_1968.mp3"
+                    type="audio/mpeg"
+            />
+            <itunes:duration>02:00:24</itunes:duration>
+            <pubDate>Thu, 04 Jan 2024</pubDate>
+        </item>
+
+        <item>
+            <title>Sample file</title>
+            <enclosure
+                    url="https://my-website-noan.web.app/sample.mp3"
+                    type="audio/mpeg"
+            />
+            <itunes:duration>undefined</itunes:duration>
+            <pubDate>Thu, 04 Jan 2024</pubDate>
+        </item>
+    </channel>
+</rss>
