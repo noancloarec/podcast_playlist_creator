@@ -2,4 +2,4 @@ rss_hosting/public
 .idea/
 __pycache__/
 public/
-
+extension/web-ext-artifacts
