@@ -1,3 +1,14 @@
+/**
+ * Representation of a podcast
+ * @typedef {Object} Podcast
+ * @property {string} title the podcast's title
+ * @property {string} url the url of the media file containing the podcast
+ */
+
+/**
+ * Retrieves the list of podcasts from the local storage
+ * @returns {Promise<Array<Podcast>>} The list of podcasts in the local storage
+ */
 const getPodcasts = () => {
     return new Promise((resolve) => {
         browser.storage.local.get("podcast-list", (list) => {
@@ -12,22 +23,22 @@ const getPodcasts = () => {
 
 /**
  * Replaces everything that is not an ascii char to make the title usable as a filename
- * @param {string} title 
+ * @param {string} title the podcast's title
  * @returns {string} the file name
  */
 const removeSpecialChars = title => title.replace(/[^A-Z0-9]/ig, "_")
 
 
 /**
- * Remove hash from title because it creates a bug in the
- * @param {string} title 
+ * Remove hash from title because it creates a bug in my podcasts app
+ * @param {string} title the podcast's title
  * @returns The title without hash
  */
 const removeHashes = title => title.replace(/#/g, "")
 
 /**
  * Remove the non latin characters from the title, otherwise eyeD3 cannot set the title properly
- * @param {string} title 
+ * @param {string} title the podcast's title
  * @returns the string with non-latin characters removed
  */
 const removeNonLatinCharacters = title => title.replace(/[\u0250-\ue007]/g, '');
@@ -59,7 +70,7 @@ const downloadPodcasts = async (targetDirectory) => {
         <pubDate>Thu, 04 Jan 2024</pubDate>
     </item>
     `).join("")
-    browser.downloads.download({ url: getDataUrlForXML("patate"), filename: `${targetDirectory}/feed.sample.xml` })
+    browser.downloads.download({ url: getDataUrlForXML(rssSample), filename: `${targetDirectory}/feed.sample.xml` })
     podcasts.forEach(p => {
         const urlWithoutGetParameters = p.url.split("?")[0]
         const extension = urlWithoutGetParameters.split(".").at(-1)
@@ -72,8 +83,10 @@ const downloadPodcasts = async (targetDirectory) => {
 
 }
 
+/**
+ * Sends a message to the content script to toggle the podcast window
+ */
 const openPodcastWindow = () => {
-    console.log("popup sends message")
     browser.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         browser.tabs.sendMessage(tabs[0].id, { action: "toggle_podcast_window" }, function (response) {
             console.log("got response", response)

@@ -1,5 +1,7 @@
-console.log("Im the background script")
-
+/**
+ * Sends the url of a podcast to the content script
+ * @param {string} url the link to the audio of the podcast 
+ */
 const sendPodcastUrlToContentScript = url => {
     browser.tabs.query({ active: true, currentWindow: true }, function (tabs) {
         console.log("sending to ", tabs[0].id)
@@ -11,6 +13,9 @@ const sendPodcastUrlToContentScript = url => {
 }
 
 
+/**
+ * Listen for mp3 or m4a requests sent by the browser, in order to record the link of the audio
+ */
 browser.webRequest.onHeadersReceived.addListener(
     function (details) {
         console.log("detected mp3 or m4a", details)

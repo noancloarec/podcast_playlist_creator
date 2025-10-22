@@ -1,5 +1,3 @@
-console.log("IM the content script")
-
 /**
  * Representation of a podcast
  * @typedef {Object} Podcast
@@ -121,7 +119,9 @@ const setCurrentPodcast = (newProps) => {
 const initPodcastWindow = async () => {
     const dt = await (await fetch(browser.runtime.getURL("podcast_window.html"))).text()
     podcastWindow = document.createElement("div")
-    podcastWindow.innerHTML = dt
+    podcastWindow.appendChild(
+        new DOMParser().parseFromString(dt, "text/html").getElementsByTagName("body")[0]
+    )
     document.body.appendChild(podcastWindow)
     document.getElementById("add-podcast").addEventListener("click", e => {
         e.stopPropagation()
@@ -158,7 +158,6 @@ const addCurrentPodcast = async () => {
  * For specific sites, use their DOM structure to automatically fill in the info
  */
 const tryToFindTitle = () => {
-    console.log("Trying to find title")
     let title;
     if (location.origin.includes("radiofrance.fr")) {
         title = document.querySelector("h1.CoverEpisode-title")?.textContent.trim()
@@ -181,6 +180,8 @@ const tryToFindTitle = () => {
     if(title){
         console.log(`Found title: ${title}`)
         setCurrentPodcast({ title })
+    }else{
+        console.log("Could not find title")
     }
 
 }
@@ -225,4 +226,5 @@ const setTitleIfSelected = (e) => {
  * Fill info about the current podcast whenever an element is clicked on the page
  * The content of the div clicked will be considered as  the title  of the podcast
  */
+console.log("adding event listener to", document)
 document.addEventListener("click", setTitleIfSelected)
