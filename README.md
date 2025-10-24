@@ -3,8 +3,16 @@
 Create an RSS feed usable by playrun
 
 ## Installation instruction
+### Prerequisites
+ - python
+ - poetry
 
-In progress, ping me @ noan.cloarec@gmail.com if you need them
+## Installation steps
+```shell
+sudo apt-get install libttspico-utils ffmpeg
+cd python_client
+poetry install
+```
 
 ## Usage
 ### Publish the podcast on your firebase project

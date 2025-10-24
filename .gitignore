@@ -3,3 +3,6 @@ rss_hosting/public
 __pycache__/
 public/
 extension/web-ext-artifacts
+python_client/firebase.json
+python_client/.firebase
+

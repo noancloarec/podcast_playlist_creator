@@ -85,7 +85,7 @@ def _get_item(rss_feed: RssFeed, podcast_filename: Path) -> Element:
         )
     except StopIteration:
         print(
-            f"Cannot find the podcast {podcast_filename.name} in this list of items : {list(rss_feed.tree.find("channel").findall("item"))}"
+            f"Cannot find the podcast {podcast_filename.name} in this list of items : {[ET.tostring(item) for item in rss_feed.tree.find("channel").findall("item")]}"
         )
         raise
 

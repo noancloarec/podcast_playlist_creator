@@ -4,8 +4,15 @@ from datetime import datetime
 from pathlib import Path
 
 import eyed3
+from tqdm import tqdm
 
 from python_client.audio_processing import convert_to_mp3, get_duration
+from python_client.firebase_hosting import create_firebase_json
+from python_client.preprocessing import (
+    convert_m4a_files_to_mp3,
+    set_id3_tags,
+    get_mp3_files,
+)
 from python_client.rss_feed import (
     RssFeed,
     get_podcast_title,
@@ -28,13 +35,16 @@ def upload_podcasts():
     shutil.copy(input_folder / "rss.xml", public_dir_path / "rss.xml")
     for mp3_file in get_mp3_files(input_folder):
         shutil.copy(mp3_file, public_dir_path / mp3_file.name)
-
-
-def get_mp3_files(folder: Path) -> list[Path]:
-    return [filename for filename in folder.iterdir() if filename.suffix == ".mp3"]
+    create_firebase_json(public_dir_path)
 
 
 def duration_to_hours(duration_in_seconds: float) -> str:
+    """
+    Translate a duration in seconds into a string representation of a duration to hours
+    e.g. 3601 becomes 01:00:01
+    :param duration_in_seconds: the duration in seconds
+    :return: the equivalent in hours:minutes:seconds, as string
+    """
     duration_in_seconds = int(duration_in_seconds)
     hours = duration_in_seconds // 3600
     minutes = (duration_in_seconds - 3600 * hours) // 60
@@ -43,30 +53,15 @@ def duration_to_hours(duration_in_seconds: float) -> str:
 
 
 def fill_podcasts_duration(in_directory: Path) -> None:
+    """
+    Given a directory that contains mp3s and an rss feed, modifies the duration item in the rss feed after having determined it with ffmpeg
+    :param in_directory: the directory that contains mp3s and an rss feed
+    """
     xml_feed = RssFeed(in_directory / "rss.xml")
     for mp3_file in get_mp3_files(in_directory):
         duration = get_duration(mp3_file)
         xml_feed = set_podcast_duration(xml_feed, mp3_file, duration_to_hours(duration))
     save_rss_feed(xml_feed, in_directory / "rss.xml")
-
-
-def set_id3_tags(in_directory: Path) -> None:
-    eyed3.log.setLevel("ERROR")
-    rss_feed = RssFeed(in_directory / "rss.xml")
-
-    for mp3_file in get_mp3_files(in_directory):
-        audio_file = eyed3.load(mp3_file)
-        audio_file.tag.title = get_podcast_title(rss_feed, mp3_file)
-        audio_file.tag.save()
-
-    return None
-
-
-def convert_m4a_files_to_mp3(in_directory: Path) -> None:
-    files = list(in_directory.iterdir())
-    for filename in files:
-        if filename.suffix == ".m4a" and filename.with_suffix(".mp3") not in files:
-            convert_to_mp3(filename, filename.with_suffix(".mp3"))
 
 
 def backup_old_rss_xml_file(public_dir_path: Path, timestamp: datetime) -> None:
@@ -82,15 +77,6 @@ def backup_old_rss_xml_file(public_dir_path: Path, timestamp: datetime) -> None:
         pass
 
 
-def create_dir_if_necessary(dir_path: Path) -> None:
-    """
-    Create a directory only if it does not exist yet
-    Used to create the public directory which will store podcasts
-    :param dir_path: the directory's path
-    """
-    dir_path.mkdir(exist_ok=True)
-
-
 def determine_public_dir_path() -> Path:
     """
     Determine the path of the public directory
@@ -98,3 +84,7 @@ def determine_public_dir_path() -> Path:
     :return:
     """
     return Path(__file__).parents[3] / "public"
+
+
+if __name__ == "__main__":
+    upload_podcasts()

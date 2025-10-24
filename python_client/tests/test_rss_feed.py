@@ -27,7 +27,7 @@ def test_get_podcast_title(dummy_rss_feed: RssFeed):
     )
 
 
-def test_get_duration(dummy_rss_feed: RssFeed):
+def test_get_podcast_duration(dummy_rss_feed: RssFeed):
     assert (
         get_podcast_duration(
             dummy_rss_feed, Path("Une_journ_e___la_radio_en_mars_1968.mp3")

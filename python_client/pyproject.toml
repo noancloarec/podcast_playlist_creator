@@ -10,10 +10,13 @@ requires-python = ">=3.12,<4.0"
 dependencies = [
     "ffmpeg-python (>=0.2.0,<0.3.0)",
     "eyed3 (>=0.9.8,<0.10.0)",
+    "tqdm (>=4.67.1,<5.0.0)",
+    "py-picotts (>=0.1.2,<0.2.0)",
 ]
 
 [project.scripts]
 upload_podcasts = 'python_client.upload_podcasts:upload_podcasts'
+split_podcasts = 'python_client.split_podcasts:split_podcasts'
 
 [tool.poetry]
 packages = [{include = "python_client", from = "src"}]

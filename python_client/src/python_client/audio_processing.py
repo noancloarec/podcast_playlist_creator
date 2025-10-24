@@ -20,3 +20,22 @@ def convert_to_mp3(input_file: Path, output_file: Path) -> None:
 
 def get_duration(input_file: Path) -> float:
     return float(ffmpeg.probe(input_file)["format"]["duration"])
+
+
+def cut_audio(
+    input_file: Path, output_file: Path, lower_bound: float, upper_bound: float
+) -> None:
+    """
+    Cut a part of an audio file
+    :param input_file: the input file path
+    :param output_file: the output file path
+    :param lower_bound: start of the segment to cut
+    :param upper_bound: end of the segment to cut
+    """
+    if not input_file.exists():
+        raise FileNotFoundError(f"File not found: {input_file}")
+    if not output_file.parent.exists():
+        raise FileNotFoundError(f"Folder not found: {input_file}")
+    ffmpeg.input(str(input_file), ss=lower_bound).output(
+        str(output_file), t=upper_bound - lower_bound
+    ).run(overwrite_output=True)
