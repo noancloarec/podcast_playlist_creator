@@ -1,10 +1,14 @@
+import shutil
 from argparse import Namespace, ArgumentParser
 from math import ceil
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
-from python_client.audio_processing import get_duration, cut_audio
+from python_client import text_to_speech
+from python_client.audio_processing import get_duration, cut_audio, concatenate_mp3s
 from python_client.preprocessing import get_mp3_files
 from python_client.rss_feed import RssFeed, get_podcast_title
+from python_client.text_to_speech import generate_part_title_audio
 from python_client.upload_podcasts import convert_m4a_files_to_mp3
 
 
@@ -30,10 +34,25 @@ def split_podcasts():
     for mp3_file in get_mp3_files(input_dir):
         split_audio(mp3_file, output_dir, segment_duration_seconds=600, overlap=10)
 
-    for title, segment in get_title_for_each_segment(
+    for segment, title in get_title_for_each_segment(
         input_dir / "rss.xml", get_mp3_files(output_dir)
     ):
-        add_title_to_segment(segment)
+        add_title_to_segment(segment, title)
+
+
+def add_title_to_segment(segment: Path, title: str) -> None:
+    """
+    Modify the mp3 segment at the given path to add a voice saying the title at the beginning of the audio
+    :param segment: mp3 segment to modify
+    :param title: audio to add
+    """
+    with TemporaryDirectory() as tmp_dir:
+        tmp_dir = Path(tmp_dir)
+        title_audio_filename = tmp_dir / f"title.mp3"
+        generate_part_title_audio(title, title_audio_filename)
+        title_and_segment_mp3 = tmp_dir / "title_and_segment.mp3"
+        concatenate_mp3s([title_audio_filename, segment], title_and_segment_mp3)
+        shutil.copy(title_and_segment_mp3, segment)
 
 
 # def split_podcast_and_add_title_at_start(
@@ -116,6 +135,7 @@ def get_title_for_each_segment(rss_file: Path, segments: list[Path]) -> dict[Pat
     Generate the title to give to each segment, relying on the segment filename and the rss feed info
     :param rss_file: the rss feed
     :param segments: the segments
+    :return A dictionary of segments and corresponding title
     """
     rss_feed = RssFeed(rss_file)
     return {segment: _get_title_for_segment(rss_feed, segment) for segment in segments}
@@ -126,6 +146,7 @@ def _get_title_for_segment(rss_feed: RssFeed, segment: Path) -> str:
     Generate the title to give to a segment, relying on the segment filename and the rss feed info
     :param rss_feed: the rss feed
     :param segment: the segment
+    :return the appropriate title for the segment
     """
 
     path_in_rss_feed = Path(segment.stem[:-14] + ".mp3")

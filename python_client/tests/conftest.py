@@ -13,7 +13,7 @@ def resources_path() -> Path:
     return _resources_path()
 
 
-def copy_resource_file_to(resource_filename: str, target_dir: Path) -> None:
+def copy_resource_file(resource_filename: str, target_dir: Path) -> None:
     shutil.copy(_resources_path() / resource_filename, target_dir)
 
 

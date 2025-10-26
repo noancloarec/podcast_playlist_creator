@@ -2,7 +2,7 @@ from datetime import datetime
 from os import listdir
 from pathlib import Path
 
-from conftest import copy_resource_file_to
+from conftest import copy_resource_file
 from python_client.rss_feed import RssFeed, get_podcast_duration
 from python_client.upload_podcasts import (
     determine_public_dir_path,
@@ -44,8 +44,8 @@ def test_backup_old_rss_xml_file_when_file_does_not_exist(tmp_path):
 
 def test_fill_podcasts_duration(tmp_path):
     # Given an input folder with an mp3 and a corresponding rss.xml
-    copy_resource_file_to("sample.mp3", tmp_path)
-    copy_resource_file_to("rss.xml", tmp_path)
+    copy_resource_file("sample.mp3", tmp_path)
+    copy_resource_file("rss.xml", tmp_path)
 
     # When fill_podcast_duration is run
     fill_podcasts_duration(tmp_path)

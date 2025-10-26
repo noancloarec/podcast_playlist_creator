@@ -39,3 +39,16 @@ def cut_audio(
     ffmpeg.input(str(input_file), ss=lower_bound).output(
         str(output_file), t=upper_bound - lower_bound
     ).run(overwrite_output=True)
+
+
+def concatenate_mp3s(mp3s: list[Path], output_mp3: Path) -> None:
+    """
+    Concatenate 2 mp3 files using ffmpeg, reencode the audio (here the title of the part and its content)
+    :param first_mp3: The path to the title
+    :param second_mp3: The path to the content
+    :param output_mp3 : The output file pat
+    """
+    ffmpeg_argument = "|".join(str(mp3) for mp3 in mp3s)
+    ffmpeg.input(f"concat:{ffmpeg_argument}").output(
+        str(output_mp3), acodec="libmp3lame"
+    ).run(overwrite_output=True)

@@ -15,7 +15,7 @@ def make_title_pronounceable(title: str) -> str:
     return title.replace("/", " sur ")
 
 
-def generate_part_title_audio(title: str, output_filename: Path):
+def generate_part_title_audio(title: str, output_filename: Path) -> None:
     title_to_tell = make_title_pronounceable(title)
     filename_wav = output_filename.with_suffix(".wav")
     picotts = PicoTTS()

@@ -4,7 +4,7 @@ from pathlib import Path
 import eyed3
 from pytest_mock import MockerFixture
 
-from conftest import copy_resource_file_to
+from conftest import copy_resource_file
 from python_client.preprocessing import (
     convert_m4a_files_to_mp3,
     set_id3_tags,
@@ -14,7 +14,7 @@ from python_client.preprocessing import (
 
 def test_convert_m4a_files_to_mp3(tmp_path: Path, mocker: MockerFixture):
     # Given an input folder containing m4a files
-    copy_resource_file_to("sample.m4a", tmp_path)
+    copy_resource_file("sample.m4a", tmp_path)
 
     # When convert_m4a_files_to_mp3 is executed
     convert_m4a_files_to_mp3(tmp_path)
@@ -33,8 +33,8 @@ def test_convert_m4a_files_to_mp3(tmp_path: Path, mocker: MockerFixture):
 
 def test_set_id3_tags(tmp_path: Path):
     # Given an input folder that contains an mp3 file which does not have an id3 title set, but has a title info in a separate file rss.xml
-    copy_resource_file_to("sample.mp3", tmp_path)
-    copy_resource_file_to("rss.xml", tmp_path)
+    copy_resource_file("sample.mp3", tmp_path)
+    copy_resource_file("rss.xml", tmp_path)
 
     # When id3 tags are set
     set_id3_tags(tmp_path)

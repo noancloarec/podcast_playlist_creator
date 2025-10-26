@@ -3,12 +3,13 @@ from pathlib import Path
 
 import pytest
 
-from conftest import copy_resource_file_to
+from conftest import copy_resource_file
 from python_client.audio_processing import get_duration
 from python_client.split_podcasts import (
     get_segments,
     split_audio,
     get_title_for_each_segment,
+    add_title_to_segment,
 )
 
 
@@ -18,7 +19,7 @@ def test_split_audio(tmp_path: Path):
     output_dir = tmp_path / "output"
     input_dir.mkdir()
     output_dir.mkdir()
-    copy_resource_file_to("sample.mp3", input_dir)
+    copy_resource_file("sample.mp3", input_dir)
 
     # When it is split into parts of 2 secs, with 1 second overlap
     split_audio(
@@ -64,7 +65,7 @@ def test_get_title_for_each_segment(tmp_path):
     ]
     for segment in segments:
         segment.touch()
-    copy_resource_file_to("rss.xml", tmp_path)
+    copy_resource_file("rss.xml", tmp_path)
 
     # When get_title_for_each_segment determines what title to give to each segment
     title_by_segment = get_title_for_each_segment(tmp_path / "rss.xml", segments)
@@ -75,3 +76,16 @@ def test_get_title_for_each_segment(tmp_path):
         tmp_path / "sample_part_02_of_03.mp3": "Partie 2 sur 3 de Sample file",
         tmp_path / "sample_part_03_of_03.mp3": "Partie 3 sur 3 de Sample file",
     }
+
+
+def test_add_title_to_segment(tmp_path):
+    # Given an output directory where there is a segment of a certain durationand a title
+    copy_resource_file("sample.mp3", tmp_path)
+    title = "Partie 2/3 de Episode 5/10 : Le titre"
+    duration = get_duration(tmp_path / "sample.mp3")
+
+    # When the title is added at the start
+    add_title_to_segment(tmp_path / "sample.mp3", title)
+
+    # Then the mp3 is modified, and lasts longer than before the modification
+    assert get_duration(tmp_path / "sample.mp3") > duration
