@@ -3,7 +3,6 @@ from pathlib import Path
 import eyed3
 from tqdm import tqdm
 
-from python_client.audio_processing import convert_to_mp3
 from python_client.rss_feed import (
     RssFeed,
     get_podcast_title,
@@ -48,8 +47,11 @@ def convert_m4a_files_to_mp3(in_directory: Path) -> None:
         for filename in files
         if filename.suffix == ".m4a" and filename.with_suffix(".mp3") not in files
     ]
+    if not len(m4a_to_convert):
+        print("No m4a to convert")
+        return
     for m4a_file in tqdm(m4a_to_convert, "Converting m4a files to mp3"):
-        convert_to_mp3(m4a_file, m4a_file.with_suffix(".mp3"))
+        print(m4a_file)
 
 
 def create_dir_if_necessary(dir_path: Path) -> None:

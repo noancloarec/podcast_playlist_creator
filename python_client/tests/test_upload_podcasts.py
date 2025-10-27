@@ -1,6 +1,5 @@
 from datetime import datetime
 from os import listdir
-from pathlib import Path
 
 from conftest import copy_resource_file
 from python_client.rss_feed import RssFeed, get_podcast_duration

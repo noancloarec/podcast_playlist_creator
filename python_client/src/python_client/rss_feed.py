@@ -1,9 +1,8 @@
 from copy import deepcopy
 from pathlib import Path
-from textwrap import dedent
 
 from xml.etree import ElementTree as ET
-from xml.etree.ElementTree import Element, ParseError, tostring
+from xml.etree.ElementTree import Element, tostring
 
 namespaces = {"itunes": "http://www.itunes.com/dtds/podcast-1.0.dtd"}
 for ns, ns_full in namespaces.items():

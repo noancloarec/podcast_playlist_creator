@@ -4,7 +4,8 @@ from math import ceil
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from python_client import text_to_speech
+from tqdm import tqdm
+
 from python_client.audio_processing import get_duration, cut_audio, concatenate_mp3s
 from python_client.preprocessing import get_mp3_files
 from python_client.rss_feed import RssFeed, get_podcast_title
@@ -31,11 +32,14 @@ def split_podcasts():
 
     convert_m4a_files_to_mp3(input_dir)
 
-    for mp3_file in get_mp3_files(input_dir):
+    for mp3_file in tqdm(get_mp3_files(input_dir), "Cutting podcasts"):
         split_audio(mp3_file, output_dir, segment_duration_seconds=600, overlap=10)
 
-    for segment, title in get_title_for_each_segment(
-        input_dir / "rss.xml", get_mp3_files(output_dir)
+    for segment, title in tqdm(
+        get_title_for_each_segment(
+            input_dir / "rss.xml", get_mp3_files(output_dir)
+        ).items(),
+        desc="Adding title to audio files",
     ):
         add_title_to_segment(segment, title)
 
@@ -120,7 +124,9 @@ def split_audio(
     """
     duration = get_duration(input_file)
     segments = get_segments(duration, segment_duration_seconds, overlap)
-    for part_number, (lower_bound, upper_bound) in enumerate(segments):
+    for part_number, (lower_bound, upper_bound) in tqdm(
+        enumerate(segments), total=len(segments), desc=f"Cutting {input_file.name}"
+    ):
         filename_suffix = f"_part_{part_number+1:02d}_of_{len(segments):02d}.mp3"
         cut_audio(
             input_file,

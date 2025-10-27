@@ -15,6 +15,7 @@ def convert_to_mp3(input_file: Path, output_file: Path) -> None:
         ac=2,  # Set audio channels to 2
         ab="192k",  # Set audio bitrate to 192k
         y=None,  # Overwrite output files without asking
+        loglevel="quiet",
     ).global_args("-v", "5").run()
 
 
@@ -37,7 +38,7 @@ def cut_audio(
     if not output_file.parent.exists():
         raise FileNotFoundError(f"Folder not found: {input_file}")
     ffmpeg.input(str(input_file), ss=lower_bound).output(
-        str(output_file), t=upper_bound - lower_bound
+        str(output_file), t=upper_bound - lower_bound, loglevel="quiet"
     ).run(overwrite_output=True)
 
 
@@ -50,5 +51,5 @@ def concatenate_mp3s(mp3s: list[Path], output_mp3: Path) -> None:
     """
     ffmpeg_argument = "|".join(str(mp3) for mp3 in mp3s)
     ffmpeg.input(f"concat:{ffmpeg_argument}").output(
-        str(output_mp3), acodec="libmp3lame"
+        str(output_mp3), acodec="libmp3lame", loglevel="quiet"
     ).run(overwrite_output=True)

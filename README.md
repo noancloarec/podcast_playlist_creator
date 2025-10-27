@@ -18,5 +18,13 @@ poetry install
 ### Publish the podcast on your firebase project
 After having downloaded the podcast into your `$HOME/podcast_creator`
 ```shell
-python -m python_client
+./upload-podcasts.sh $HOME/podcast_creator
 ```
+
+### Split the podcasts you have downloaded
+This is useful for devices that do not have a fast-forward or backward functionnality. To avoid having to listen to the entire podcast when only interested in the second half of it.  
+This was made to be able to listen to podcasts with my swimming headset, which does not have a screen to display what track is being read.
+```shell
+cd python_client
+./split_podcasts.sh $HOME/Downloads/podcasts_to_split $HOME/Downloads/split_podcasts
+``` 

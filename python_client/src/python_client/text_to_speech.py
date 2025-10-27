@@ -1,4 +1,3 @@
-import shutil
 from pathlib import Path
 
 from picotts import PicoTTS

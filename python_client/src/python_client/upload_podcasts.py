@@ -3,10 +3,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-import eyed3
-from tqdm import tqdm
-
-from python_client.audio_processing import convert_to_mp3, get_duration
+from python_client.audio_processing import get_duration
 from python_client.firebase_hosting import create_firebase_json
 from python_client.preprocessing import (
     convert_m4a_files_to_mp3,
@@ -15,7 +12,6 @@ from python_client.preprocessing import (
 )
 from python_client.rss_feed import (
     RssFeed,
-    get_podcast_title,
     save_rss_feed,
     set_podcast_duration,
 )

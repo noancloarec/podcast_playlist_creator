@@ -127,5 +127,5 @@ const openPodcastWindow = () => {
 }
 
 document.getElementById("download-podcasts").addEventListener("click", () => downloadPodcasts("podcast_creator"))
-document.getElementById("download-podcasts-to-be-cut").addEventListener("click", () => downloadPodcasts("podcasts_to_cut"))
+document.getElementById("download-podcasts-to-be-split").addEventListener("click", () => downloadPodcasts("podcasts_to_split"))
 document.getElementById("toggle-podcast-window").addEventListener("click", openPodcastWindow)
