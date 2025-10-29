@@ -1,4 +1,8 @@
 rss_hosting/public
 .idea/
 __pycache__/
+public/
 extension/web-ext-artifacts
+python_client/firebase.json
+python_client/.firebase
+

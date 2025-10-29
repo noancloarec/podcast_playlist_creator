@@ -47,8 +47,24 @@ const removeNonLatinCharacters = title => title.replace(/[\u0250-\ue007]/g, '');
  * Generate the data url for an xml file
  */
 const getDataUrlForXML = xmlData => {
-    const blob = new Blob([xmlData], {type: "text/xml;charset=utf-8"})
-    return URL.createObjectURL(blob)
+    return `data:text/xml;charset=utf-8,${xmlData}`
+}
+
+
+/**
+ * Download a file
+ * Warning : In firefox the behavior of this function was unreliable when calling this function many times in a row. This problem has not been investigated yet
+ * @param {string} uri The uri (url or data url)
+ * @param {string} name The name of the file to download
+ */
+const downloadURL = (uri, name) => {
+    var link = document.createElement("a");
+    link.download = name;
+    link.href = uri;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    delete link;
 }
 
 /**
@@ -59,7 +75,17 @@ const getDataUrlForXML = xmlData => {
  */
 const downloadPodcasts = async (targetDirectory) => {
     const podcasts = await getPodcasts()
-    const rssSample = podcasts.map(p => `
+    const rssFeedHeader = `\
+        <rss version="2.0" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+        <script />
+        <channel>
+            <title>Noan's podcasts</title>
+            <link>https://podcasts-noan.web.app/rss.xml</link>
+            <description>An auto generated podcast playlist</description>
+            <language>fr</language>
+            <copyright>Radio France, Timeline</copyright>`
+        .replace("        ", "")
+    const items = podcasts.map(p => `
     <item>
         <title>${removeNonLatinCharacters(removeHashes(p.title))}</title>
         <enclosure
@@ -70,7 +96,12 @@ const downloadPodcasts = async (targetDirectory) => {
         <pubDate>Thu, 04 Jan 2024</pubDate>
     </item>
     `).join("")
-    browser.downloads.download({ url: getDataUrlForXML(rssSample), filename: `${targetDirectory}/feed.sample.xml` })
+    const rssFeedFooter = `\
+                </channel>
+        </rss>`.replaceAll("        ", "")
+
+    const rssFeed = rssFeedHeader + items + rssFeedFooter
+    downloadURL(getDataUrlForXML(rssFeed), `rss.xml`)
     podcasts.forEach(p => {
         const urlWithoutGetParameters = p.url.split("?")[0]
         const extension = urlWithoutGetParameters.split(".").at(-1)
@@ -96,5 +127,5 @@ const openPodcastWindow = () => {
 }
 
 document.getElementById("download-podcasts").addEventListener("click", () => downloadPodcasts("podcast_creator"))
-document.getElementById("download-podcasts-to-be-cut").addEventListener("click", () => downloadPodcasts("podcasts_to_cut"))
+document.getElementById("download-podcasts-to-be-split").addEventListener("click", () => downloadPodcasts("podcasts_to_split"))
 document.getElementById("toggle-podcast-window").addEventListener("click", openPodcastWindow)
