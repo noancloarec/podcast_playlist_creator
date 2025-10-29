@@ -52,7 +52,7 @@ def add_title_to_segment(segment: Path, title: str) -> None:
     """
     with TemporaryDirectory() as tmp_dir:
         tmp_dir = Path(tmp_dir)
-        title_audio_filename = tmp_dir / f"title.mp3"
+        title_audio_filename = tmp_dir / "title.mp3"
         generate_part_title_audio(title, title_audio_filename)
         title_and_segment_mp3 = tmp_dir / "title_and_segment.mp3"
         concatenate_mp3s([title_audio_filename, segment], title_and_segment_mp3)

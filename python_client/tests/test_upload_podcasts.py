@@ -5,7 +5,6 @@ from conftest import copy_resource_file
 from python_client.rss_feed import RssFeed, get_podcast_duration
 from python_client.upload_podcasts import (
     determine_public_dir_path,
-    create_dir_if_necessary,
     backup_old_rss_xml_file,
     fill_podcasts_duration,
     duration_to_hours,

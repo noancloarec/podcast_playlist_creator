@@ -23,7 +23,7 @@ def test_convert_m4a_files_to_mp3(tmp_path: Path, mocker: MockerFixture):
     assert set(listdir(tmp_path)) == {"sample.m4a", "sample.mp3"}
 
     # When it is called although the mp3 already exists
-    convert_to_mp3_spy = mocker.patch("python_client.upload_podcasts.convert_to_mp3")
+    convert_to_mp3_spy = mocker.patch("python_client.preprocessing.convert_to_mp3")
     convert_m4a_files_to_mp3(tmp_path)
 
     # The folder still has this structure but ffmpeg has not been called uselessly

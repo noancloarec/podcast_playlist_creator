@@ -9,6 +9,7 @@ from python_client.preprocessing import (
     convert_m4a_files_to_mp3,
     set_id3_tags,
     get_mp3_files,
+    create_dir_if_necessary,
 )
 from python_client.rss_feed import (
     RssFeed,
