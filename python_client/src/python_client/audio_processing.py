@@ -36,7 +36,7 @@ def cut_audio(
     if not input_file.exists():
         raise FileNotFoundError(f"File not found: {input_file}")
     if not output_file.parent.exists():
-        raise FileNotFoundError(f"Folder not found: {input_file}")
+        raise FileNotFoundError(f"Folder not found: {output_file.parent}")
     ffmpeg.input(str(input_file), ss=lower_bound).output(
         str(output_file), t=upper_bound - lower_bound, loglevel="quiet"
     ).run(overwrite_output=True)

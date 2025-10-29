@@ -3,7 +3,7 @@ name = "python-client"
 version = "0.1.0"
 description = ""
 authors = [
-    {name = "Noan Cloarec",email = "noan.cloarec-ext@rca.fr"}
+    {name = "Noan Cloarec"}
 ]
 readme = "README.md"
 requires-python = ">=3.12,<4.0"

@@ -4,6 +4,7 @@ from pathlib import Path
 from xml.etree import ElementTree as ET
 from xml.etree.ElementTree import Element, tostring
 
+# Registering the namespaces is mandatory for ElementTree to be able to interpret then and be able to search through the feed
 namespaces = {"itunes": "http://www.itunes.com/dtds/podcast-1.0.dtd"}
 for ns, ns_full in namespaces.items():
     ET.register_namespace(ns, ns_full)
@@ -32,8 +33,6 @@ def get_podcast_duration(rss_feed: RssFeed, podcast_filename: Path) -> str:
     :param podcast_filename: the filename of the podcast, only the end of the path will be considered
     :return: the duration of the podcast
     """
-    print("rss_feed")
-    print(tostring(rss_feed.tree.getroot()))
     item = _get_item(rss_feed, podcast_filename)
     duration_element: Element | None = item.find(
         "itunes:duration", namespaces=namespaces
@@ -54,7 +53,7 @@ def set_podcast_duration(
 ) -> RssFeed:
     """
     Set the duration of a podcast in an RSS feed given the podcast's filename, returning a new RSS Feed
-    :param rss_feed: the rss feed
+    :param rss_feed: the rss feed, it will not be modified
     :param podcast_filename: the filename of the podcast, only the end of the path will be considered
     :param duration: The duration of the podcast
     :return: The RSSFeed with the duration item modified
