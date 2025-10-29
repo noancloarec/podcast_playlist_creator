@@ -14,6 +14,10 @@ from python_client.upload_podcasts import convert_m4a_files_to_mp3
 
 
 def parse_args() -> Namespace:
+    """
+    Parse the arguments from the command line
+    :return: the arguments input_folder and output_folder from sys.argv[1] and sys.argv[2]
+    """
     parser = ArgumentParser(description="Simple calculator")
     parser.add_argument(
         "input_folder",
@@ -25,6 +29,9 @@ def parse_args() -> Namespace:
 
 
 def split_podcasts():
+    """
+    Split the podcasts from an input directory in sys.argv to an output directory
+    """
     args = parse_args()
     input_dir = Path(args.input_folder)
     output_dir = Path(args.output_folder)
@@ -57,42 +64,6 @@ def add_title_to_segment(segment: Path, title: str) -> None:
         title_and_segment_mp3 = tmp_dir / "title_and_segment.mp3"
         concatenate_mp3s([title_audio_filename, segment], title_and_segment_mp3)
         shutil.copy(title_and_segment_mp3, segment)
-
-
-# def split_podcast_and_add_title_at_start(
-#     podcast: Podcast,
-#     input_dir: Path,
-#     output_dir: Path,
-#     part_duration: int,
-#     overlap: int,
-# ) -> None:
-#     """
-#     Split the podcast in several parts of a given duration, add the title pronounced at the beginning of each podcast
-#     :param podcast: the podcast to be splat
-#     :param input_dir: the dir where the podcast can be found
-#     :param output_dir: the dir where to write the podcast parts
-#     """
-#     podcast_stem = str(Path(podcast.filename).stem)
-#     with TemporaryDirectory() as temp_dir_str:
-#         temp_dir = Path(temp_dir_str)
-#
-#         for part_number, total_parts, part_filename in split_audio(
-#             input_dir / podcast.filename, temp_dir, part_duration
-#         ):
-#             title_audio = temp_dir / (
-#                 podcast_stem + f"_partie_{part_number:02}_title.mp3"
-#             )
-#
-#             generate_part_title_audio(
-#                 f"Partie {part_number}/{total_parts} de {podcast.title}",
-#                 title_audio,
-#             )
-#
-#             merge_mp3s(
-#                 title_audio,
-#                 part_filename,
-#                 output_dir / part_filename.name,
-#             )
 
 
 def get_segments(

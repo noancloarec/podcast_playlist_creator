@@ -18,8 +18,11 @@ from python_client.rss_feed import (
 )
 
 
-def upload_podcasts():
-
+def prepare_podcast_upload():
+    """
+    Takes the RSS feed and audio files from the download folder
+    Prepare and move them to a public directory where they will be ready to use for the podcast app
+    """
     input_folder = Path(sys.argv[1])
 
     public_dir_path = determine_public_dir_path()
@@ -81,7 +84,3 @@ def determine_public_dir_path() -> Path:
     :return:
     """
     return Path(__file__).parents[3] / "public"
-
-
-if __name__ == "__main__":
-    upload_podcasts()

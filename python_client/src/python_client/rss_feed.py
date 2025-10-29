@@ -11,6 +11,10 @@ for ns, ns_full in namespaces.items():
 
 
 class RssFeed:
+    """
+    A container class for the Rss feed, read from rss.xml
+    """
+
     def __init__(self, input_file_path: Path):
         content = input_file_path.read_text(encoding="utf-8")
         self.tree = ET.ElementTree(ET.fromstring(content))
@@ -71,6 +75,11 @@ def set_podcast_duration(
 
 
 def save_rss_feed(rss_feed: RssFeed, path: Path) -> None:
+    """
+    Save an rss feed to the given path
+    :param rss_feed: the rss feed to save
+    :param path: the target path
+    """
     rss_feed.tree.write(path, encoding="utf-8")
 
 

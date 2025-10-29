@@ -15,7 +15,7 @@ dependencies = [
 ]
 
 [project.scripts]
-upload_podcasts = 'python_client.upload_podcasts:upload_podcasts'
+prepare_podcast_upload = 'python_client.upload_podcasts:prepare_podcast_upload'
 split_podcasts = 'python_client.split_podcasts:split_podcasts'
 
 [tool.poetry]

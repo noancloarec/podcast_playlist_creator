@@ -20,6 +20,11 @@ def convert_to_mp3(input_file: Path, output_file: Path) -> None:
 
 
 def get_duration(input_file: Path) -> float:
+    """
+    Get the duration of an audio file using ffmpeg
+    :param input_file: the audio file
+    :return: its duration in seconds
+    """
     return float(ffmpeg.probe(input_file)["format"]["duration"])
 
 
