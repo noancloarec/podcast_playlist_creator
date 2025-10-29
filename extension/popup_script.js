@@ -1,4 +1,3 @@
-console.log("im the popup script")
 /**
  * Representation of a podcast
  * @typedef {Object} Podcast
