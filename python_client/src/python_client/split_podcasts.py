@@ -100,10 +100,10 @@ def get_segments(
 ) -> list[tuple[int, int]]:
     """
     Generates the segments of an audio to be split into windows with an overlap
-    :param duration:
-    :param window_size:
-    :param overlap:
-    :return:
+    :param duration: the duration of the audio
+    :param window_size: the segment size, i.e. about how long should a segment last
+    :param overlap: the overlap, i.e. the duration of the part that is repeated between each segment
+    :return: a list of (segment_start_time, segment_end_time), in seconds
     """
     return [
         (timecode, timecode + window_size + overlap)
@@ -120,7 +120,6 @@ def split_audio(
     :param output_dir: The target directory for the splits
     :param segment_duration_seconds: the approximate duration of a split in seconds
     :param overlap: The overlap between each segments, so a sentence is not cut in the middle
-    :return: An iterator of tuples (part_number, total_parts, duration)
     """
     duration = get_duration(input_file)
     segments = get_segments(duration, segment_duration_seconds, overlap)

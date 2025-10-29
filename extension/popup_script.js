@@ -53,6 +53,7 @@ const getDataUrlForXML = xmlData => {
 
 /**
  * Download a file
+ * Warning : In firefox the behavior of this function was unreliable when calling this function many times in a row. This problem has not been investigated yet
  * @param {string} uri The uri (url or data url)
  * @param {string} name The name of the file to download
  */

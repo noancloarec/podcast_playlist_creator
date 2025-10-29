@@ -22,8 +22,7 @@ def get_mp3_files(folder: Path) -> list[Path]:
 def set_id3_tags(in_directory: Path) -> None:
     """
     Take the rss.xml file in a directory, use the title of each item in the rss feed to set the mp3's title metadata
-    :param in_directory:
-    :return:
+    :param in_directory: The directory containing an rss.xml file and the mp3 files mentioned in the rss.xml
     """
     eyed3.log.setLevel("ERROR")
     rss_feed = RssFeed(in_directory / "rss.xml")
@@ -32,8 +31,6 @@ def set_id3_tags(in_directory: Path) -> None:
         audio_file = eyed3.load(mp3_file)
         audio_file.tag.title = get_podcast_title(rss_feed, mp3_file)
         audio_file.tag.save()
-
-    return None
 
 
 def convert_m4a_files_to_mp3(in_directory: Path) -> None:
