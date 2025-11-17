@@ -6,6 +6,7 @@ Create an RSS feed usable by playrun
 ### Prerequisites
  - python
  - poetry
+ - firebase
 
 ### Install the web extension
 From [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/podcast-playlist-creator/).  
@@ -16,6 +17,10 @@ Once the podcasts are downloaded with the extension
 sudo apt-get install libttspico-utils ffmpeg
 cd python_client
 poetry install
+```
+### Log into firebase
+```shell
+firebase login
 ```
 
 ## Usage
