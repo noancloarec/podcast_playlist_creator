@@ -3,7 +3,7 @@ name = "python-client"
 version = "0.1.0"
 description = ""
 authors = [
-    {name = "Noan Cloarec"}
+    { name = "Noan Cloarec" }
 ]
 readme = "README.md"
 requires-python = ">=3.12,<4.0"
@@ -19,7 +19,7 @@ prepare_podcast_upload = 'python_client.upload_podcasts:prepare_podcast_upload'
 split_podcasts = 'python_client.split_podcasts:split_podcasts'
 
 [tool.poetry]
-packages = [{include = "python_client", from = "src"}]
+packages = [{ include = "python_client", from = "src" }]
 
 
 [tool.poetry.group.dev.dependencies]
@@ -28,6 +28,11 @@ black = "^25.9.0"
 ruff = "^0.14.1"
 mypy = "^1.18.2"
 pytest-mock = "^3.15.1"
+
+[tool.pytest.ini_options]
+pythonpath = [
+    "."
+]
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

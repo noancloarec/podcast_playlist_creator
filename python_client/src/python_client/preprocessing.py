@@ -7,6 +7,7 @@ from python_client.audio_processing import convert_to_mp3
 from python_client.rss_feed import (
     RssFeed,
     get_podcast_title,
+    list_filenames,
 )
 
 
@@ -29,8 +30,12 @@ def set_id3_tags(in_directory: Path) -> None:
 
     for mp3_file in tqdm(get_mp3_files(in_directory), "Setting id3 tags"):
         audio_file = eyed3.load(mp3_file)
+        if audio_file is None:
+            raise ValueError(
+                f"EyeD3 could not read the file {mp3_file}, you may retry the download if the file is corrupt, or remove it."
+            )
         audio_file.tag.title = get_podcast_title(rss_feed, mp3_file)
-        audio_file.tag.save()
+        audio_file.tag.save(encoding="utf-8")
 
 
 def convert_m4a_files_to_mp3(in_directory: Path) -> None:
@@ -59,3 +64,29 @@ def create_dir_if_necessary(dir_path: Path) -> None:
     :param dir_path: the directory's path
     """
     dir_path.mkdir(exist_ok=True)
+
+
+def ensure_no_unnecessary_files_will_be_uploaded(input_path: Path) -> None:
+    """
+    Make sure there are no unnecessary file to be uploaded
+    This is relevant so the user remember to clean its download directory from all the previous podcast they have already listened to and do not need to be uploaded again.
+    :param input_path: The input directory that contains the podcasts and the rss.xml file
+    """
+    rss_feed = RssFeed(input_path / "rss.xml")
+    filenames_in_feed = set(Path(f).stem for f in list_filenames(rss_feed))
+    unneccessary_filenames_in_input_directory = [
+        filename
+        for filename in input_path.iterdir()
+        if filename.stem not in filenames_in_feed and filename.suffix != ".xml"
+    ]
+    if unneccessary_filenames_in_input_directory:
+        filenames_list = "\n".join(
+            filename.name for filename in unneccessary_filenames_in_input_directory
+        )
+        raise ValueError(
+            (
+                f"The following files are present in the directory {input_path} "
+                "but are not found in the file rss.xml: \n"
+                f"{filenames_list}"
+            )
+        )

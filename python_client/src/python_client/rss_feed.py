@@ -16,8 +16,21 @@ class RssFeed:
     """
 
     def __init__(self, input_file_path: Path):
+        self.input_file_path = input_file_path
         content = input_file_path.read_text(encoding="utf-8")
         self.tree = ET.ElementTree(ET.fromstring(content))
+
+
+def list_filenames(rss_feed) -> list[str]:
+    """
+    List all the filenames in the rss feed
+    :param rss_feed: the rss feed
+    :return the list of filenames mentioned in the rss feed
+    """
+    return [
+        _get_item_filename(item)
+        for item in rss_feed.tree.find("channel").findall("item")
+    ]
 
 
 def get_podcast_title(rss_feed: RssFeed, podcast_filename: Path) -> str:
@@ -92,7 +105,7 @@ def _get_item(rss_feed: RssFeed, podcast_filename: Path) -> Element:
         )
     except StopIteration:
         print(
-            f"Cannot find the podcast {podcast_filename.name} in this list of items : {[ET.tostring(item) for item in rss_feed.tree.find("channel").findall("item")]}"
+            f"Cannot find the podcast {podcast_filename.name} in the rss feed {rss_feed.input_file_path.name}"
         )
         raise
 
