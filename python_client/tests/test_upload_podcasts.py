@@ -4,7 +4,7 @@ from os import listdir
 from python_client.rss_feed import RssFeed, get_podcast_duration
 from python_client.upload_podcasts import (
     determine_public_dir_path,
-    backup_old_rss_xml_file,
+    backup_rss_xml_file,
     fill_podcasts_duration,
     duration_to_hours,
 )
@@ -26,7 +26,7 @@ def test_backup_old_rss_xml_file_when_file_exists(tmp_path):
     (tmp_path / "rss.xml").touch()
 
     # When it is backed up at a certain time
-    backup_old_rss_xml_file(tmp_path, datetime(2025, 10, 30, 8, 12, 0))
+    backup_rss_xml_file(tmp_path, datetime(2025, 10, 30, 8, 12, 0))
 
     # Then the file is renamed with the given timestamp
     assert listdir(tmp_path) == ["rss_251030_081200.xml"]
@@ -35,7 +35,7 @@ def test_backup_old_rss_xml_file_when_file_exists(tmp_path):
 def test_backup_old_rss_xml_file_when_file_does_not_exist(tmp_path):
     # Given an empty directory
     # When it is backed up at a certain time
-    backup_old_rss_xml_file(tmp_path, datetime(2025, 10, 30, 8, 12, 0))
+    backup_rss_xml_file(tmp_path, datetime(2025, 10, 30, 8, 12, 0))
     # Then the directory still is empty
     assert listdir(tmp_path) == []
 

@@ -10,6 +10,7 @@ from python_client.preprocessing import (
     set_id3_tags,
     get_mp3_files,
     create_dir_if_necessary,
+    ensure_no_unnecessary_files_will_be_uploaded,
 )
 from python_client.rss_feed import (
     RssFeed,
@@ -20,20 +21,21 @@ from python_client.rss_feed import (
 
 def prepare_podcast_upload():
     """
-    Takes the RSS feed and audio files from the download folder
+    Takes the RSS feed and audio files from the download directory
     Prepare and move them to a public directory where they will be ready to use for the podcast app
     """
-    input_folder = Path(sys.argv[1])
+    input_directory = Path(sys.argv[1])
+    ensure_no_unnecessary_files_will_be_uploaded(input_directory)
 
     public_dir_path = determine_public_dir_path()
     create_dir_if_necessary(public_dir_path)
-    backup_old_rss_xml_file(public_dir_path, datetime.now())
-    convert_m4a_files_to_mp3(input_folder)
-    set_id3_tags(input_folder)
-    fill_podcasts_duration(input_folder)
+    backup_rss_xml_file(public_dir_path, datetime.now())
+    convert_m4a_files_to_mp3(input_directory)
+    set_id3_tags(input_directory)
+    fill_podcasts_duration(input_directory)
 
-    shutil.copy(input_folder / "rss.xml", public_dir_path / "rss.xml")
-    for mp3_file in get_mp3_files(input_folder):
+    shutil.copy(input_directory / "rss.xml", public_dir_path / "rss.xml")
+    for mp3_file in get_mp3_files(input_directory):
         shutil.copy(mp3_file, public_dir_path / mp3_file.name)
     create_firebase_json(public_dir_path)
 
@@ -43,7 +45,7 @@ def duration_to_hours(duration_in_seconds: float) -> str:
     Translate a duration in seconds into a string representation of a duration to hours
     e.g. 3601 becomes 01:00:01
     :param duration_in_seconds: the duration in seconds
-    :return: the equivalent in hours:minutes:seconds, as string
+    :return: the equivalent in hours:minutes:seconds, as a string
     """
     duration_in_seconds = int(duration_in_seconds)
     hours = duration_in_seconds // 3600
@@ -64,7 +66,7 @@ def fill_podcasts_duration(in_directory: Path) -> None:
     save_rss_feed(xml_feed, in_directory / "rss.xml")
 
 
-def backup_old_rss_xml_file(public_dir_path: Path, timestamp: datetime) -> None:
+def backup_rss_xml_file(public_dir_path: Path, timestamp: datetime) -> None:
     """ "
     Back up the rss file, if it exists, by adding a timestamp to its name
     :param public_dir_path the path of the public

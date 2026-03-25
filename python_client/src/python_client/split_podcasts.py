@@ -97,7 +97,7 @@ def split_audio(
     for part_number, (lower_bound, upper_bound) in tqdm(
         enumerate(segments), total=len(segments), desc=f"Cutting {input_file.name}"
     ):
-        filename_suffix = f"_part_{part_number+1:02d}_of_{len(segments):02d}.mp3"
+        filename_suffix = f"_part_{part_number + 1:02d}_of_{len(segments):02d}.mp3"
         cut_audio(
             input_file,
             output_file=output_dir / (input_file.stem + filename_suffix),

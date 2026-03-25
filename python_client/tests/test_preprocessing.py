@@ -1,13 +1,16 @@
+import shutil
 from os import listdir
 from pathlib import Path
 
 import eyed3
+import pytest
 from pytest_mock import MockerFixture
 
 from python_client.preprocessing import (
     convert_m4a_files_to_mp3,
     set_id3_tags,
     create_dir_if_necessary,
+    ensure_no_unnecessary_files_will_be_uploaded,
 )
 from tests.helpers import copy_resource_file
 
@@ -64,3 +67,26 @@ def test_create_dir_if_necessary_when_dir_does_not_exist(tmp_path: Path):
     create_dir_if_necessary(tmp_path / "public")
     # Then the directory has been created
     assert "public" in listdir(tmp_path)
+
+
+def test_ensure_no_unnecessary_files_will_be_uploaded(tmp_path):
+    # Given an input directory containing unnecessary files
+    copy_resource_file("sample.mp3", tmp_path)
+    copy_resource_file("rss.xml", tmp_path)
+    # The 2 following files do not appear in the rss.xml file
+    shutil.copy(tmp_path / "sample.mp3", tmp_path / "another_file.mp3")
+    shutil.copy(
+        tmp_path / "sample.mp3",
+        tmp_path / "another_file_with_another_audio_extension.m4a",
+    )
+
+    # When ensure_no_unnecessary_files_will_be_uploaded is called
+    with pytest.raises(ValueError) as e:
+        ensure_no_unnecessary_files_will_be_uploaded(tmp_path)
+
+    # Then an error is thrown telling us another_file.mp3 and another_file_with_another_audio_extension.m4a
+    assert str(e.value) == (
+        f"The following files are present in the directory {tmp_path} but are not found in the file rss.xml: \n"
+        f"another_file.mp3\n"
+        f"another_file_with_another_audio_extension.m4a"
+    )

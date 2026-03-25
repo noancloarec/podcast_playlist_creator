@@ -12,6 +12,3 @@ def resources_path() -> Path:
     :return: the resources directory path
     """
     return _resources_path()
-
-
-
