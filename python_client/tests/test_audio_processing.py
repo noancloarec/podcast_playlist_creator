@@ -3,13 +3,13 @@ from os import listdir
 import pytest
 from pytest import approx
 
-from conftest import copy_resource_file
 from python_client.audio_processing import (
     get_duration,
     convert_to_mp3,
     cut_audio,
     concatenate_mp3s,
 )
+from tests.helpers import copy_resource_file
 
 
 def test_convert_to_mp3(tmp_path):

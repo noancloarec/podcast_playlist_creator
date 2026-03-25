@@ -4,12 +4,12 @@ from pathlib import Path
 import eyed3
 from pytest_mock import MockerFixture
 
-from conftest import copy_resource_file
 from python_client.preprocessing import (
     convert_m4a_files_to_mp3,
     set_id3_tags,
     create_dir_if_necessary,
 )
+from tests.helpers import copy_resource_file
 
 
 def test_convert_m4a_files_to_mp3(tmp_path: Path, mocker: MockerFixture):

@@ -3,7 +3,6 @@ from pathlib import Path
 
 import pytest
 
-from conftest import copy_resource_file
 from python_client.audio_processing import get_duration
 from python_client.split_podcasts import (
     get_segments,
@@ -11,6 +10,7 @@ from python_client.split_podcasts import (
     get_title_for_each_segment,
     add_title_to_segment,
 )
+from tests.helpers import copy_resource_file
 
 
 def test_split_audio(tmp_path: Path):

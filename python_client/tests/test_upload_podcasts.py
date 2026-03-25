@@ -1,7 +1,6 @@
 from datetime import datetime
 from os import listdir
 
-from conftest import copy_resource_file
 from python_client.rss_feed import RssFeed, get_podcast_duration
 from python_client.upload_podcasts import (
     determine_public_dir_path,
@@ -9,6 +8,7 @@ from python_client.upload_podcasts import (
     fill_podcasts_duration,
     duration_to_hours,
 )
+from tests.helpers import copy_resource_file
 
 
 def test_determine_public_dir_path():
