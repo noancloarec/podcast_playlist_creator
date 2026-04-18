@@ -31,21 +31,10 @@ dev = [
     "pytest-mock>=3.15.1,<4",
 ]
 
-[tool.uv]
-default-groups = "all"
-
-[tool.hatch.build.targets.sdist]
-include = ["src/python_client"]
-
-[tool.hatch.build.targets.wheel]
-include = ["src/python_client"]
-
-[tool.hatch.build.targets.wheel.sources]
-"src/python_client" = "python_client"
-
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["uv_build>=0.8.7,<0.12.0"]
+build-backend = "uv_build"
+
 
 [tool.pytest.ini_options]
 pythonpath = [
