@@ -1,1 +1,1 @@
-poetry run split_podcasts $1 $2
+uv run split_podcasts $1 $2
