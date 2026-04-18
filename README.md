@@ -5,7 +5,7 @@ Create an RSS feed usable by playrun
 ## Installation
 ### Prerequisites
  - python
- - poetry
+ - uv
  - firebase
 
 ### Install the web extension
@@ -16,7 +16,7 @@ Once the podcasts are downloaded with the extension
 ```shell
 sudo apt-get install libttspico-utils ffmpeg
 cd python_client
-poetry install
+uv sync
 ```
 ### Log into firebase
 ```shell
@@ -39,4 +39,4 @@ This was made to be able to listen to podcasts with my swimming headset, which d
 ```shell
 cd python_client
 ./split_podcasts.sh $HOME/Downloads/podcasts_to_split $HOME/Downloads/split_podcasts
-``` 
+```
